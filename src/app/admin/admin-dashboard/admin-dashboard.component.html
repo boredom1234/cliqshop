@@ -1,0 +1,438 @@
+<div
+  class="dashboard"
+  [class.loading]="isLoading"
+  data-dashboard-container="true"
+  [attr.data-loading-state]="isLoading"
+>
+  <h2 class="dashboard__title">Dashboard</h2>
+
+  <!-- Loading indicator -->
+  <div *ngIf="isLoading" class="loading-indicator">
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <!-- Error message -->
+  <div
+    *ngIf="
+      !isLoading && totalProducts === 0 && totalOrders === 0 && totalUsers === 0
+    "
+    class="error-message"
+  >
+    <p>
+      {{
+        errorMessage || "Unable to load dashboard data. Please try again later."
+      }}
+    </p>
+
+    <!-- Retry button -->
+    <button class="retry-button" (click)="loadDashboardData()">
+      Retry Loading Data
+    </button>
+
+    <!-- Debug tools for 500 errors -->
+    <div
+      class="troubleshooting-tips"
+      *ngIf="
+        errorMessage.includes('Server error (500)') ||
+        errorMessage.includes('missing on the backend')
+      "
+    >
+      <h4>Backend Issue Detected</h4>
+      <div class="debug-note">
+        <p>
+          <strong>Backend Error:</strong> The dashboard statistics endpoint is
+          not implemented in the backend.
+        </p>
+        <p>
+          Error message:
+          <code
+            >NoResourceFoundException: No static resource
+            api/admin/dashboard/statistics.</code
+          >
+        </p>
+      </div>
+
+      <div class="solution-note">
+        <h5>Solution for Backend Developer:</h5>
+        <p>
+          Create a controller endpoint in the Spring backend at
+          <code>/api/admin/dashboard/statistics</code> that returns:
+        </p>
+        <pre class="code-block">
+&#123;
+  "success": true,
+  "message": "Dashboard statistics retrieved successfully",
+  "data": &#123;
+    "totalProducts": 123,
+    "totalOrders": 45,
+    "totalUsers": 67,
+    "recentOrders": []
+  &#125;
+&#125;
+        </pre>
+      </div>
+
+      <h4>Debug Tools:</h4>
+      <div class="debug-actions">
+        <button class="debug-button" (click)="testApiWithoutAuth()">
+          Test API Without Auth
+        </button>
+        <button
+          class="debug-button"
+          (click)="testApiWithNewEndpoint('/api/admin/test-connection')"
+        >
+          Test Connection Endpoint
+        </button>
+        <button class="debug-button" (click)="clearTokenAndRetry()">
+          Clear Token & Retry
+        </button>
+        <button class="debug-button" (click)="testWorkingEndpoint()">
+          Test Working Endpoint
+        </button>
+        <button class="debug-button" (click)="testWithFetch()">
+          Test With Fetch API
+        </button>
+        <button class="debug-button" (click)="testWithCurlHeaders()">
+          Test Curl-like Headers
+        </button>
+      </div>
+
+      <!-- Troubleshooting tips -->
+      <div
+        class="troubleshooting-tips"
+        *ngIf="errorMessage.includes('Cannot connect')"
+      >
+        <h4>Troubleshooting Tips:</h4>
+        <ul>
+          <li>
+            Make sure the backend server is running at http://localhost:5000
+          </li>
+          <li>Check that your network connection is working properly</li>
+          <li>Try refreshing the page</li>
+        </ul>
+      </div>
+
+      <!-- Authentication error help -->
+      <div
+        class="troubleshooting-tips"
+        *ngIf="errorMessage.includes('Authentication')"
+      >
+        <h4>Fix Authentication:</h4>
+        <ul>
+          <li>Try logging out and logging back in</li>
+          <li>Your session may have expired</li>
+          <li>Clear browser cache and cookies if problems persist</li>
+        </ul>
+
+        <!-- Quick action button for auth issues -->
+        <button class="action-button" routerLink="/auth/login">
+          Go to Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stable height container that doesn't shrink during transitions -->
+  <div class="stable-content" data-stable-container="true" *ngIf="!isLoading">
+    <!-- Overview Statistics -->
+    <div class="stats-overview">
+      <div class="stats-grid" data-grid-container="true">
+        <div class="stats-card">
+          <h3 class="stats-card__value">{{ totalProducts }}</h3>
+          <p class="stats-card__label">Products</p>
+        </div>
+
+        <div class="stats-card">
+          <h3 class="stats-card__value">{{ totalOrders }}</h3>
+          <p class="stats-card__label">Orders</p>
+        </div>
+
+        <div class="stats-card">
+          <h3 class="stats-card__value">{{ totalCustomers }}</h3>
+          <p class="stats-card__label">Customers</p>
+        </div>
+
+        <div class="stats-card">
+          <h3 class="stats-card__value">${{ dailyRevenue.toFixed(2) }}</h3>
+          <p class="stats-card__label">Daily Revenue</p>
+        </div>
+
+        <div class="stats-card">
+          <h3 class="stats-card__value">${{ weeklyRevenue.toFixed(2) }}</h3>
+          <p class="stats-card__label">Weekly Revenue</p>
+        </div>
+
+        <div class="stats-card">
+          <h3 class="stats-card__value">${{ totalRevenue.toFixed(2) }}</h3>
+          <p class="stats-card__label">Total Revenue</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <app-dashboard-charts
+      [revenueByDay]="revenueByDay"
+      [ordersByDay]="ordersByDay"
+      [revenueByMonth]="revenueByMonth"
+      [ordersByMonth]="ordersByMonth"
+      [topSellingProducts]="topSellingProducts"
+      [pendingOrders]="pendingOrders"
+      [confirmedOrders]="confirmedOrders"
+      [shippedOrders]="shippedOrders"
+      [deliveredOrders]="deliveredOrders"
+      [cancelledOrders]="cancelledOrders">
+    </app-dashboard-charts>
+
+    <!-- Order Status Section -->
+    <div class="dashboard-section order-status-section">
+      <h3 class="section-title">Order Status</h3>
+      <div class="status-grid">
+        <div
+          class="status-card"
+          style="cursor: pointer;"
+          [routerLink]="['/admin/orders']"
+          [queryParams]="{ status: 'Pending' }"
+        >
+          <div class="status-icon pending">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h4 class="status-value">{{ pendingOrders }}</h4>
+          <p class="status-label">Pending</p>
+        </div>
+
+        <div
+          class="status-card"
+          style="cursor: pointer;"
+          [routerLink]="['/admin/orders']"
+          [queryParams]="{ status: 'Confirmed' }"
+        >
+          <div class="status-icon confirmed">
+            <i class="fas fa-check"></i>
+          </div>
+          <h4 class="status-value">{{ confirmedOrders }}</h4>
+          <p class="status-label">Confirmed</p>
+        </div>
+
+        <div
+          class="status-card"
+          style="cursor: pointer;"
+          [routerLink]="['/admin/orders']"
+          [queryParams]="{ status: 'Shipped' }"
+        >
+          <div class="status-icon shipped">
+            <i class="fas fa-truck"></i>
+          </div>
+          <h4 class="status-value">{{ shippedOrders }}</h4>
+          <p class="status-label">Shipped</p>
+        </div>
+
+        <div
+          class="status-card"
+          style="cursor: pointer;"
+          [routerLink]="['/admin/orders']"
+          [queryParams]="{ status: 'Delivered' }"
+        >
+          <div class="status-icon delivered">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <h4 class="status-value">{{ deliveredOrders }}</h4>
+          <p class="status-label">Delivered</p>
+        </div>
+
+        <div
+          class="status-card"
+          style="cursor: pointer;"
+          [routerLink]="['/admin/orders']"
+          [queryParams]="{ status: 'Cancelled' }"
+        >
+          <div class="status-icon cancelled">
+            <i class="fas fa-times"></i>
+          </div>
+          <h4 class="status-value">{{ cancelledOrders }}</h4>
+          <p class="status-label">Cancelled</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Metrics Section -->
+    <div class="dashboard-section performance-section">
+      <h3 class="section-title">Performance Metrics</h3>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <h4 class="metric-label">Average Order Value</h4>
+          <p class="metric-value">${{ averageOrderValue.toFixed(2) }}</p>
+        </div>
+
+        <div class="metric-card">
+          <h4 class="metric-label">Conversion Rate</h4>
+          <p class="metric-value">{{ conversionRate }}%</p>
+        </div>
+
+        <div class="metric-card">
+          <h4 class="metric-label">Active Customers</h4>
+          <p class="metric-value">{{ activeCustomers }}</p>
+        </div>
+
+        <div class="metric-card">
+          <h4 class="metric-label">New Customers This Month</h4>
+          <p class="metric-value">{{ newCustomersThisMonth }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Status Section -->
+    <div class="dashboard-section inventory-section">
+      <h3 class="section-title">Inventory Status</h3>
+      <div class="inventory-grid">
+        <div
+          class="inventory-card"
+          style="cursor: pointer;"
+          [routerLink]="['/admin/stock/low']"
+        >
+          <div class="inventory-icon low-stock">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h4 class="inventory-value">{{ lowStockProducts }}</h4>
+          <p class="inventory-label">&nbsp;Low Stock Products</p>
+        </div>
+
+        <div
+          class="inventory-card"
+          style="cursor: pointer;"
+          [routerLink]="['/admin/products']"
+          [queryParams]="{ inventoryStatus: 'out_of_stock' }"
+        >
+          <div class="inventory-icon out-of-stock">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <h4 class="inventory-value">{{ outOfStockProducts }}</h4>
+          <p class="inventory-label">&nbsp;Out of Stock Products</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Statistics Section -->
+    <!-- <div class="dashboard-section user-stats-section">
+      <h3 class="section-title">User Statistics</h3>
+      <div class="user-stats-grid">
+        <div class="user-stats-card">
+          <h4 class="user-stats-label">Total Users</h4>
+          <p class="user-stats-value">{{ totalUsersCount }}</p>
+        </div>
+        <div class="user-stats-card" *ngFor="let role of usersByRole | keyvalue">
+          <h4 class="user-stats-label">{{ role.key }}</h4>
+          <p class="user-stats-value">{{ role.value }}</p>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Top Selling Products Section -->
+    <div class="dashboard-section top-products-section">
+      <h3 class="section-title">Top Selling Products</h3>
+      <div class="products-grid">
+        <div class="product-card" *ngFor="let product of topSellingProducts">
+          <div class="product-image">
+            <img [src]="product.imageUrl" [alt]="product.name" />
+          </div>
+          <div class="product-details">
+            <h4 class="product-name">{{ product.name }}</h4>
+            <p class="product-stat">{{ product.totalQuantity }} Units Sold</p>
+            <p class="product-revenue">
+              ${{ product.totalRevenue.toFixed(2) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Customers Section -->
+    <div class="dashboard-section top-customers-section">
+      <h3 class="section-title">Top Customers</h3>
+      <div class="customers-table-container">
+        <table class="customers-table data-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Email</th>
+              <th>Orders</th>
+              <th>Total Spent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let customer of topCustomers">
+              <td>{{ customer.name }}</td>
+              <td>{{ customer.email }}</td>
+              <td>{{ customer.orderCount }}</td>
+              <td>${{ customer.totalSpent.toFixed(2) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent orders section with min-height -->
+    <div class="recent-orders" data-recent-orders="true">
+      <h3 class="recent-orders__title">Recent Orders</h3>
+
+      <div class="table-container" *ngIf="recentOrders.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of recentOrders">
+              <td>#{{ order.id }}</td>
+              <td>{{ order.customerName }}</td>
+              <td>{{ order.createdAt | date : "MMM d, y" }}</td>
+              <td>${{ order.total.toFixed(2) }}</td>
+              <td>
+                <span class="status" [ngClass]="order.status.toLowerCase()">
+                  {{ order.status }}
+                </span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button
+                    class="action-button view"
+                    [routerLink]="['/admin/orders', order.id]"
+                  >
+                    View
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div
+        *ngIf="recentOrders.length === 0 && isLoading"
+        class="loading-container"
+      >
+        <p>Loading recent orders...</p>
+      </div>
+
+      <div *ngIf="recentOrders.length === 0 && !isLoading" class="no-data">
+        <p *ngIf="totalOrders > 0">
+          <!-- Orders exist in the system. Navigate to -->
+          <a routerLink="/admin/orders">Orders</a>
+        </p>
+        <p *ngIf="totalOrders === 0">No orders found in the system yet.</p>
+      </div>
+
+      <div class="view-all-link" *ngIf="totalOrders > 0">
+        <a routerLink="/admin/orders">View All Orders</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty space filler to ensure minimum height -->
+  <div class="height-filler" data-height-filler="true"></div>
+</div>

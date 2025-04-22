@@ -1,0 +1,278 @@
+<app-user-layout>
+  <div class="profile-content">
+    <!-- Show error message if any -->
+    <div *ngIf="error" class="alert alert-danger">
+      <strong>Error:</strong> {{ error }}
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading profile</p>
+    </div>
+
+    <!-- User profile information -->
+    <div *ngIf="!loading && userProfile" class="profile-dashboard">
+      <!-- API Data Notice -->
+      <!-- <div class="api-data-notice">
+        <div class="notice-content">
+          <p><strong>Note:</strong> The API now returns complete user information.</p>
+          <p class="notice-details">API Response: <code>{{ "{" }} id: {{userProfile.id}}, email: "{{userProfile.email}}", name: "{{userProfile.name}}", address: "{{userProfile.address}}", phoneNumber: "{{userProfile.phoneNumber}}", role: "{{userProfile.role}}" {{ "}" }}</code></p>
+        </div>
+      </div> -->
+
+      <!-- Success messages -->
+      <div *ngIf="profileUpdateSuccess" class="alert alert-success">
+        <strong>Success:</strong> {{ profileUpdateSuccess }}
+      </div>
+      <div *ngIf="passwordChangeSuccess" class="alert alert-success">
+        <strong>Success:</strong> {{ passwordChangeSuccess }}
+      </div>
+
+      <!-- Account Information Card -->
+      <div *ngIf="!updateProfileMode" class="profile-card">
+        <div class="profile-section">
+          <h2>Account Information</h2>
+          <div class="profile-details">
+            <div class="detail-row">
+              <span class="detail-label">Full Name</span>
+              <span class="detail-value">{{ userProfile.name }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Email</span>
+              <span class="detail-value">{{ userProfile.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Phone Number</span>
+              <span class="detail-value">{{ userProfile.phoneNumber }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Address</span>
+              <span class="detail-value">{{ userProfile.address }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">City</span>
+              <span class="detail-value">{{ userProfile.city }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">State</span>
+              <span class="detail-value">{{ userProfile.state }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Postal Code</span>
+              <span class="detail-value">{{ userProfile.postalCode }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Country</span>
+              <span class="detail-value">{{ userProfile.country }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Account Type</span>
+              <span class="detail-value">{{ userProfile.role }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Member Since</span>
+              <span class="detail-value">{{ formatDate(userProfile.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Profile Form -->
+      <div *ngIf="updateProfileMode" class="profile-card">
+        <div class="profile-section">
+          <h2>Update Profile</h2>
+          
+          <div *ngIf="profileUpdateError" class="alert alert-danger">
+            <strong>Error:</strong> {{ profileUpdateError }}
+          </div>
+          
+          <form [formGroup]="profileForm" (ngSubmit)="submitProfileUpdate()" class="profile-form">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input 
+                type="text" 
+                id="name" 
+                formControlName="name" 
+                class="form-control"
+                [ngClass]="{'is-invalid': profileForm.get('name')?.invalid && profileForm.get('name')?.touched}"
+              >
+              <div *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched" class="error-message">
+                <span *ngIf="profileForm.get('name')?.errors?.['required']">Name is required</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input 
+                type="text" 
+                id="address" 
+                formControlName="address" 
+                class="form-control"
+                [ngClass]="{'is-invalid': profileForm.get('address')?.invalid && profileForm.get('address')?.touched}"
+              >
+              <div *ngIf="profileForm.get('address')?.invalid && profileForm.get('address')?.touched" class="error-message">
+                <span *ngIf="profileForm.get('address')?.errors?.['required']">Address is required</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="city">City</label>
+              <input 
+                type="text" 
+                id="city" 
+                formControlName="city" 
+                class="form-control"
+                [ngClass]="{'is-invalid': profileForm.get('city')?.invalid && profileForm.get('city')?.touched}"
+              >
+              <div *ngIf="profileForm.get('city')?.invalid && profileForm.get('city')?.touched" class="error-message">
+                <span *ngIf="profileForm.get('city')?.errors?.['required']">City is required</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="state">State</label>
+              <input 
+                type="text" 
+                id="state" 
+                formControlName="state" 
+                class="form-control"
+                [ngClass]="{'is-invalid': profileForm.get('state')?.invalid && profileForm.get('state')?.touched}"
+              >
+              <div *ngIf="profileForm.get('state')?.invalid && profileForm.get('state')?.touched" class="error-message">
+                <span *ngIf="profileForm.get('state')?.errors?.['required']">State is required</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="postalCode">Postal Code</label>
+              <input 
+                type="text" 
+                id="postalCode" 
+                formControlName="postalCode" 
+                class="form-control"
+                [ngClass]="{'is-invalid': profileForm.get('postalCode')?.invalid && profileForm.get('postalCode')?.touched}"
+              >
+              <div *ngIf="profileForm.get('postalCode')?.invalid && profileForm.get('postalCode')?.touched" class="error-message">
+                <span *ngIf="profileForm.get('postalCode')?.errors?.['required']">Postal Code is required</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input 
+                type="text" 
+                id="country" 
+                formControlName="country" 
+                class="form-control"
+                [ngClass]="{'is-invalid': profileForm.get('country')?.invalid && profileForm.get('country')?.touched}"
+              >
+              <div *ngIf="profileForm.get('country')?.invalid && profileForm.get('country')?.touched" class="error-message">
+                <span *ngIf="profileForm.get('country')?.errors?.['required']">Country is required</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input 
+                type="text" 
+                id="phoneNumber" 
+                formControlName="phoneNumber" 
+                class="form-control"
+                [ngClass]="{'is-invalid': profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched}"
+              >
+              <div *ngIf="profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched" class="error-message">
+                <span *ngIf="profileForm.get('phoneNumber')?.errors?.['required']">Phone number is required</span>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" [disabled]="profileForm.invalid || profileUpdateLoading">
+                <span *ngIf="!profileUpdateLoading">Save Changes</span>
+                <span *ngIf="profileUpdateLoading">Updating...</span>
+              </button>
+              <button type="button" class="btn-outline" (click)="toggleUpdateProfileMode()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Change Password Form -->
+      <div *ngIf="changePasswordMode" class="profile-card">
+        <div class="profile-section">
+          <h2>Change Password</h2>
+          
+          <div *ngIf="passwordChangeError" class="alert alert-danger">
+            <strong>Error:</strong> {{ passwordChangeError }}
+          </div>
+          
+          <form [formGroup]="passwordForm" (ngSubmit)="submitPasswordChange()" class="profile-form">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input 
+                type="password" 
+                id="currentPassword" 
+                formControlName="currentPassword" 
+                class="form-control"
+                [ngClass]="{'is-invalid': passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched}"
+              >
+              <div *ngIf="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched" class="error-message">
+                <span *ngIf="passwordForm.get('currentPassword')?.errors?.['required']">Current password is required</span>
+                <span *ngIf="passwordForm.get('currentPassword')?.errors?.['minlength']">Password must be at least 6 characters</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input 
+                type="password" 
+                id="newPassword" 
+                formControlName="newPassword" 
+                class="form-control"
+                [ngClass]="{'is-invalid': passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched}"
+              >
+              <div *ngIf="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched" class="error-message">
+                <span *ngIf="passwordForm.get('newPassword')?.errors?.['required']">New password is required</span>
+                <span *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6 characters</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="confirmPassword">Confirm New Password</label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                formControlName="confirmPassword" 
+                class="form-control"
+                [ngClass]="{'is-invalid': (passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['notMatching']) && passwordForm.get('confirmPassword')?.touched}"
+              >
+              <div *ngIf="(passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['notMatching']) && passwordForm.get('confirmPassword')?.touched" class="error-message">
+                <span *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']">Confirm password is required</span>
+                <span *ngIf="passwordForm.errors?.['notMatching']">Passwords do not match</span>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" [disabled]="passwordForm.invalid || profileUpdateLoading">
+                <span *ngIf="!profileUpdateLoading">Change Password</span>
+                <span *ngIf="profileUpdateLoading">Updating...</span>
+              </button>
+              <button type="button" class="btn-outline" (click)="toggleChangePasswordMode()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Account Actions -->
+      <div *ngIf="!updateProfileMode && !changePasswordMode" class="profile-card">
+        <div class="profile-section">
+          <h2>Account Actions</h2>
+          <div class="action-buttons">
+            <button class="btn-primary" (click)="toggleUpdateProfileMode()">Update Profile</button>
+            <button class="btn-outline" (click)="toggleChangePasswordMode()">Change Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-user-layout>

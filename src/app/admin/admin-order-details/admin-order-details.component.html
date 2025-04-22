@@ -1,0 +1,135 @@
+<div class="order-details-container">
+  <div class="back-section">
+    <button class="back-button" (click)="goBack()">
+      ← Back to Orders
+    </button>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading order details...</p>
+  </div>
+
+  <!-- Error state -->
+  <div class="error-state" *ngIf="error">
+    <p class="error-message">{{ errorMessage }}</p>
+    <button class="back-button" (click)="goBack()">Return to Orders</button>
+  </div>
+
+  <!-- Order details -->
+  <div class="order-details" *ngIf="!loading && !error && order">
+    <div class="order-header">
+      <div class="order-id">
+        <h2>Order #{{ order.id }}</h2>
+        <span class="status-badge" [ngClass]="order.status.toLowerCase()">{{ order.status }}</span>
+      </div>
+      <div class="order-actions" *ngIf="canUpdateStatus(order.status)">
+        <div class="status-selector">
+          <select class="status-select" [(ngModel)]="selectedStatus" [disabled]="processingStatus">
+            <option value="PENDING" [disabled]="order.status === 'PENDING'">PENDING</option>
+            <option value="CONFIRMED" [disabled]="order.status === 'CONFIRMED'">CONFIRMED</option>
+            <option value="SHIPPED" [disabled]="order.status === 'SHIPPED'">SHIPPED</option>
+            <option value="DELIVERED" [disabled]="order.status === 'DELIVERED'">DELIVERED</option>
+            <option value="CANCELLED" [disabled]="order.status === 'CANCELLED'">CANCELLED</option>
+          </select>
+          <button 
+            class="status-button"
+            [disabled]="processingStatus || selectedStatus === order.status"
+            (click)="updateOrderStatus(selectedStatus)"
+          >
+            {{ processingStatus ? 'Processing...' : 'Update Status' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-meta">
+      <div class="meta-item">
+        <span class="label">Date:</span>
+        <span class="value">{{ formatDate(order.createdAt) }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Payment Status:</span>
+        <span class="value">{{ order.paymentStatus }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Total Amount:</span>
+        <span class="value">{{ formatCurrency(order.totalAmount) }}</span>
+      </div>
+    </div>
+
+    <div class="order-sections">
+      <div class="section customer-info">
+        <h3>Customer Information</h3>
+        <div class="info-content" *ngIf="order.userName">
+          <div class="info-item">
+            <span class="label">Name:</span>
+            <span class="value">{{ order.userName }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Email:</span>
+            <span class="value">{{ order.userEmail }}</span>
+          </div>
+          <div class="info-item" *ngIf="order.userPhoneNumber">
+            <span class="label">Phone:</span>
+            <span class="value">{{ order.userPhoneNumber }}</span>
+          </div>
+        </div>
+        <div class="info-content" *ngIf="!order.userName">
+          <p class="no-data">No customer information available</p>
+        </div>
+      </div>
+
+      <div class="section shipping-info">
+        <h3>Shipping Information</h3>
+        <div class="info-content">
+          <div class="info-item">
+            <span class="label">Address:</span>
+            <span class="value">{{ order.shippingAddress }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section order-items">
+      <h3>Order Items</h3>
+      <div class="items-table-container">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of order.items">
+              <td class="product-cell">
+                <div class="product-info">
+                  <div class="product-image">
+                    <img [src]="item.productImage" [alt]="item.productName">
+                  </div>
+                  <div class="product-details">
+                    <p class="product-name">{{ item.productName }}</p>
+                    <p class="product-id">Product ID: {{ item.productId }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>{{ formatCurrency(item.price) }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ formatCurrency(item.subtotal || (item.price * item.quantity)) }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="total-label">Total</td>
+              <td class="total-value">{{ formatCurrency(order.totalAmount) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div> 

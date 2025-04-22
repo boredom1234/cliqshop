@@ -1,0 +1,292 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Define missing color variable
+$color-gray-50: #fafafa;
+
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* Prevent host element from causing overflow */
+}
+
+.product-list {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Prevent horizontal overflow */
+  
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    width: 100%;
+    box-sizing: border-box;
+    
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+  
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    
+    @media (max-width: 768px) {
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}
+
+.debug-info {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #eee;
+  background-color: #fafafa;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Prevent horizontal overflow */
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  
+  @media (max-width: 768px) {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .search-input {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    width: 100%;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    box-sizing: border-box;
+    
+    &:focus {
+      outline: none;
+      border-color: #000;
+    }
+  }
+}
+
+.add-button {
+  display: inline-block;
+  background-color: #000;
+  color: #fff;
+  padding: 12px 25px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    text-align: center;
+  }
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.table-container {
+  margin-bottom: 40px;
+  border: 1px solid #eee;
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  max-width: 100%; /* Ensure the container doesn't exceed the parent width */
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px; /* Minimum width to ensure readability */
+  
+  th, td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    white-space: normal; /* Allow text to wrap */
+  }
+  
+  th {
+    font-weight: 500;
+    color: #666;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #fafafa;
+  }
+  
+  tbody tr:hover {
+    background-color: #fafafa;
+  }
+  
+  .loading, .no-data {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+}
+
+.product-cell {
+  display: flex;
+  align-items: center;
+  max-width: 250px; /* Limit width of product cell */
+  
+  .product-image {
+    width: 50px;
+    height: 50px;
+    background-size: cover;
+    background-position: center;
+    margin-right: 20px;
+    border: 1px solid #eee;
+    flex-shrink: 0;
+  }
+  
+  .product-info {
+    overflow: hidden; /* Hide overflow */
+    
+    .product-name {
+      font-weight: 500;
+      margin-bottom: 5px;
+      letter-spacing: 0.02em;
+      text-overflow: ellipsis; /* Add ellipsis for long text */
+      overflow: hidden; /* Hide overflow */
+      white-space: nowrap; /* Keep product name on a single line */
+    }
+    
+    .product-category {
+      font-size: 12px;
+      color: #999;
+      letter-spacing: 0.02em;
+      text-overflow: ellipsis; /* Add ellipsis for long text */
+      overflow: hidden; /* Hide overflow */
+      white-space: nowrap; /* Keep category on a single line */
+    }
+  }
+}
+
+.status {
+  display: inline-block;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  
+  &.active {
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
+  }
+  
+  &.inactive {
+    background: #f9f9f9;
+    color: #666;
+    border: 1px solid #eee;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* Allow buttons to wrap if needed */
+  gap: 8px; /* Add space between wrapped buttons */
+  
+  .action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    white-space: nowrap;
+    
+    &.edit {
+      color: #000;
+      text-decoration: none;
+      border-bottom: 1px solid #000;
+      margin-right: 15px;
+      
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+    
+    &.toggle {
+      color: #666;
+      
+      &:hover {
+        color: #000;
+      }
+    }
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+  width: 100%;
+  flex-wrap: wrap; /* Allow pagination to wrap on small screens */
+  gap: 10px;
+  
+  &__button {
+    background: none;
+    border: 1px solid #eee;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    &:hover:not(:disabled) {
+      background-color: #fafafa;
+    }
+  }
+  
+  &__item {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+}

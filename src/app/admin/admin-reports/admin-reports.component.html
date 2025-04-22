@@ -1,0 +1,413 @@
+<div class="reports-container">
+  <h2 class="reports-title">Reports</h2>
+  
+  <div class="reports-controls">
+    <div class="report-selector">
+      <label for="reportType">Report Type:</label>
+      <select id="reportType" [(ngModel)]="selectedReport" (change)="onReportChange()">
+        <option value="dashboard">Dashboard Report</option>
+        <option value="inventory">Inventory Report</option>
+        <option value="customers">Customer Activity Report</option>
+        <option value="sales">Sales Report</option>
+      </select>
+    </div>
+    
+    <div class="date-filters" *ngIf="selectedReport === 'customers' || selectedReport === 'sales'">
+      <div class="date-range">
+        <div class="date-input">
+          <label for="startDate">Start Date:</label>
+          <input 
+            type="date" 
+            id="startDate" 
+            [(ngModel)]="startDate" 
+            (change)="onDateChange()"
+          >
+        </div>
+        <div class="date-input">
+          <label for="endDate">End Date:</label>
+          <input 
+            type="date" 
+            id="endDate" 
+            [(ngModel)]="endDate" 
+            (change)="onDateChange()"
+          >
+        </div>
+      </div>
+    </div>
+    
+    <div class="refresh-button">
+      <button (click)="refreshCurrentReport()">
+        Refresh Report
+      </button>
+    </div>
+  </div>
+  
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading[selectedReport]" class="loading-indicator">
+    <p>Loading report data...</p>
+  </div>
+  
+  <!-- Error Messages -->
+  <div *ngIf="errorMessages[selectedReport]" class="error-message">
+    <p>{{ errorMessages[selectedReport] }}</p>
+  </div>
+  
+  <!-- Dashboard Report -->
+  <div *ngIf="selectedReport === 'dashboard' && dashboardReport && !isLoading.dashboard" class="report-content">
+    <div class="report-header">
+      <h3>{{ dashboardReport.reportName }}</h3>
+      <p class="report-date">Generated at: {{ formatDate(dashboardReport.generatedAt) }}</p>
+      <button class="export-button" (click)="exportToGoogleSheets('dashboard')" [disabled]="isExporting.dashboard">
+        <i class="fas fa-file-export"></i>
+        {{ isExporting.dashboard ? 'Uploading...' : 'Export to Google Sheets' }}
+      </button>
+    </div>
+    
+    <div class="summary-cards">
+      <div class="summary-card">
+        <h4><i class="fas fa-shopping-cart"></i> Orders</h4>
+        <div class="stat-value">{{ dashboardReport.summary.totalOrders }}</div>
+        <div class="stat-breakdown">
+          <div *ngFor="let item of dashboardReport.summary.ordersByStatus | keyvalue" class="stat-item">
+            <span class="stat-label">{{ item.key }}:</span>
+            <span class="stat-value">{{ item.value }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <h4><i class="fas fa-dollar-sign"></i> Revenue</h4>
+        <div class="stat-value">${{ formatCurrency(dashboardReport.summary.totalRevenue) }}</div>
+        <div class="stat-item">
+          <span class="stat-label">Avg. Order Value:</span>
+          <span class="stat-value">${{ formatCurrency(dashboardReport.summary.averageOrderValue) }}</span>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <h4><i class="fas fa-box"></i> Products</h4>
+        <div class="stat-value">{{ dashboardReport.summary.totalProducts }}</div>
+        <div class="stat-breakdown">
+          <div class="stat-item">
+            <span class="stat-label">Low Stock:</span>
+            <span class="stat-value">{{ dashboardReport.summary.lowStockProducts }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Out of Stock:</span>
+            <span class="stat-value">{{ dashboardReport.summary.outOfStockProducts }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">With No Sales:</span>
+            <span class="stat-value">{{ dashboardReport.summary.productsWithNoSales }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <h4><i class="fas fa-users"></i> Customers</h4>
+        <div class="stat-value">{{ dashboardReport.summary.totalCustomers }}</div>
+        <div class="stat-breakdown">
+          <div class="stat-item">
+            <span class="stat-label">Active:</span>
+            <span class="stat-value">{{ dashboardReport.summary.activeCustomers }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Inactive:</span>
+            <span class="stat-value">{{ dashboardReport.summary.inactiveCustomers }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="report-sections">
+      <div class="report-section">
+        <h4>Top Selling Products</h4>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Quantity Sold</th>
+              <th>Revenue</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of dashboardReport.summary.topProducts">
+              <td>{{ product.productName }}</td>
+              <td>{{ product.category }}</td>
+              <td>${{ formatCurrency(product.price) }}</td>
+              <td>{{ product.quantitySold }}</td>
+              <td>${{ formatCurrency(product.revenue) }}</td>
+              <td>{{ product.currentStock }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="report-section">
+        <h4>Top Customers</h4>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Orders</th>
+              <th>Avg. Order Value</th>
+              <th>Total Spent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let customer of dashboardReport.summary.topCustomers">
+              <td>{{ customer.customerName }}</td>
+              <td>{{ customer.email }}</td>
+              <td>{{ customer.orderCount }}</td>
+              <td>${{ formatCurrency(customer.averageOrderValue) }}</td>
+              <td>${{ formatCurrency(customer.totalSpent) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Inventory Report -->
+  <div *ngIf="selectedReport === 'inventory' && inventoryReport && !isLoading.inventory" class="report-content">
+    <div class="report-header">
+      <h3>{{ inventoryReport.reportName }}</h3>
+      <p class="report-date">Generated at: {{ formatDate(inventoryReport.generatedAt) }}</p>
+      <button class="export-button" (click)="exportToGoogleSheets('inventory')" [disabled]="isExporting.inventory">
+        <i class="fas fa-file-export"></i>
+        {{ isExporting.inventory ? 'Uploading...' : 'Export to Google Sheets' }}
+      </button>
+    </div>
+    
+    <div class="summary-cards">
+      <div class="summary-card">
+        <h4><i class="fas fa-warehouse"></i> Inventory Overview</h4>
+        <div class="stat-item">
+          <span class="stat-label">Total Products:</span>
+          <span class="stat-value">{{ inventoryReport.summary.totalProducts }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Inventory Value:</span>
+          <span class="stat-value">${{ formatCurrency(inventoryReport.summary.inventoryValue) }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Low Stock Products:</span>
+          <span class="stat-value">{{ inventoryReport.summary.lowStockProducts }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Out of Stock Products:</span>
+          <span class="stat-value">{{ inventoryReport.summary.outOfStockProducts }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="report-section">
+      <h4>Product Inventory</h4>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Current Stock</th>
+            <th>Stock Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of inventoryReport.data">
+            <td>{{ product.productId }}</td>
+            <td>{{ product.productName }}</td>
+            <td>{{ product.category }}</td>
+            <td>${{ formatCurrency(product.price) }}</td>
+            <td>{{ product.currentStock }}</td>
+            <td>
+              <span [ngClass]="{'status-adequate': product.stockStatus === 'ADEQUATE', 
+                               'status-low': product.stockStatus === 'LOW', 
+                               'status-out': product.stockStatus === 'OUT_OF_STOCK'}">
+                {{ product.stockStatus }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Customer Report -->
+  <div *ngIf="selectedReport === 'customers' && customerReport && !isLoading.customers" class="report-content">
+    <div class="report-header">
+      <h3>{{ customerReport.reportName }}</h3>
+      <p class="report-date">Generated at: {{ formatDate(customerReport.generatedAt) }}</p>
+      <p>Report Period: {{ formatDate(customerReport.parameters.startDate) }} to {{ formatDate(customerReport.parameters.endDate) }}</p>
+      <button class="export-button" (click)="exportToGoogleSheets('customers')" [disabled]="isExporting.customers">
+        <i class="fas fa-file-export"></i>
+        {{ isExporting.customers ? 'Uploading...' : 'Export to Google Sheets' }}
+      </button>
+    </div>
+    
+    <div class="summary-cards">
+      <div class="summary-card">
+        <h4><i class="fas fa-user-friends"></i> Customer Overview</h4>
+        <div class="stat-item">
+          <span class="stat-label">Total Customers:</span>
+          <span class="stat-value">{{ customerReport.summary.totalCustomers }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Active Customers:</span>
+          <span class="stat-value">{{ customerReport.summary.activeCustomers }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Inactive Customers:</span>
+          <span class="stat-value">{{ customerReport.summary.inactiveCustomers }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Revenue:</span>
+          <span class="stat-value">${{ formatCurrency(customerReport.summary.totalRevenue) }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="report-section">
+      <h4>Customer Activity</h4>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Orders</th>
+            <th>Avg. Order Value</th>
+            <th>Total Spent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let customer of customerReport.data">
+            <td>{{ customer.customerName }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.orderCount }}</td>
+            <td>${{ formatCurrency(customer.averageOrderValue) }}</td>
+            <td>${{ formatCurrency(customer.totalSpent) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Sales Report -->
+  <div *ngIf="selectedReport === 'sales' && salesReport && !isLoading.sales" class="report-content">
+    <div class="report-header">
+      <h3>{{ salesReport.reportName }}</h3>
+      <p class="report-date">Generated at: {{ formatDate(salesReport.generatedAt) }}</p>
+      <p>Report Period: {{ formatDate(salesReport.parameters.startDate) }} to {{ formatDate(salesReport.parameters.endDate) }}</p>
+      <button class="export-button" (click)="exportToGoogleSheets('sales')" [disabled]="isExporting.sales">
+        <i class="fas fa-file-export"></i>
+        {{ isExporting.sales ? 'Uploading...' : 'Export to Google Sheets' }}
+      </button>
+    </div>
+    
+    <div class="summary-cards">
+      <div class="summary-card">
+        <h4><i class="fas fa-chart-line"></i> Sales Overview</h4>
+        <div class="stat-item">
+          <span class="stat-label">Total Orders:</span>
+          <span class="stat-value">{{ salesReport.summary.totalOrders }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Revenue:</span>
+          <span class="stat-value">${{ formatCurrency(salesReport.summary.totalRevenue) }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Average Order Value:</span>
+          <span class="stat-value">${{ formatCurrency(salesReport.summary.averageOrderValue) }}</span>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <h4><i class="fas fa-tasks"></i> Orders by Status</h4>
+        <div class="stat-breakdown">
+          <div *ngFor="let item of salesReport.summary.ordersByStatus | keyvalue" class="stat-item">
+            <span class="stat-label">{{ item.key }}:</span>
+            <span class="stat-value">{{ item.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="report-section">
+      <h4>Order Details</h4>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of salesReport.data">
+            <td>{{ order.orderId }}</td>
+            <td>{{ order.customer }}</td>
+            <td>{{ formatDate(order.orderDate) }}</td>
+            <td>${{ formatCurrency(order.amount) }}</td>
+            <td>{{ order.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Export URL Modal -->
+  <div class="export-modal" *ngIf="showExportModal">
+    <div class="export-modal-content">
+      <div class="export-modal-header">
+        <h3>Export Successful!</h3>
+        <button class="close-button" (click)="closeExportModal()">×</button>
+      </div>
+      <div class="export-modal-body">
+        <p>Your report has been uploaded and is available for 60 minutes.</p>
+        
+        <div class="export-section">
+          <label>File URL:</label>
+          <div class="copy-container">
+            <input id="export-url" type="text" [value]="exportUrl" readonly class="url-display">
+            <button class="copy-button" (click)="copyUrl()">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="export-section">
+          <label>Google Sheets Formula:</label>
+          <div class="copy-container">
+            <input id="import-formula" type="text" [value]="importFormula" readonly class="url-display">
+            <button class="copy-button" (click)="copyFormula()">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="instructions">
+          <h4>How to use:</h4>
+          <ol>
+            <li>Click the "Open Google Sheets" button below</li>
+            <li>Click cell A1 in the new sheet</li>
+            <li>Paste the formula (already copied to clipboard)</li>
+            <li>Press Enter to import the data</li>
+          </ol>
+          
+          <div class="action-buttons">
+            <button class="sheets-button" (click)="openGoogleSheets()">
+              <i class="fas fa-external-link-alt"></i> Open Google Sheets
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

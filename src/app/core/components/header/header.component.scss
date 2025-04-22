@@ -1,0 +1,225 @@
+@use '../../../../styles/variables' as vars;
+
+.header {
+  width: 100%;
+  padding: vars.$spacing-md 0;
+  background-color: vars.$color-white;
+  border-bottom: 1px solid vars.$color-gray-200;
+  position: sticky;
+  top: 0;
+  z-index: vars.$z-index-header;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: vars.$spacing-sm vars.$spacing-lg;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: vars.$font-size-xl;
+  font-weight: 700;
+  
+  a {
+    color: vars.$color-black;
+    text-decoration: none;
+    letter-spacing: 1.2px;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: vars.$color-gray-700;
+    }
+  }
+}
+
+.nav-links {
+  ul {
+    display: flex;
+    gap: vars.$spacing-xl;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    
+    li {
+      a {
+        color: vars.$color-gray-800;
+        text-decoration: none;
+        font-weight: 500;
+        padding: vars.$spacing-xs vars.$spacing-sm;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+        
+        &:hover, &.active {
+          color: vars.$color-black;
+          border-bottom-color: vars.$color-black;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: vars.$breakpoint-md) {
+    display: none;
+  }
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-lg;
+  
+  button, a {
+    background: none;
+    border: none;
+    color: vars.$color-gray-700;
+    font-size: vars.$font-size-base;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: vars.$spacing-xs;
+    transition: all 0.2s ease;
+    position: relative;
+    
+    &:hover {
+      color: vars.$color-black;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+  
+  .auth-link {
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    
+    &:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: vars.$color-black;
+      transition: width 0.3s ease;
+    }
+    
+    &:hover:after {
+      width: 100%;
+    }
+  }
+  
+  .cart-button {
+    text-decoration: none;
+    position: relative;
+    
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: vars.$color-black;
+      color: vars.$color-white;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+  
+  .user-menu-container {
+    position: relative;
+    
+    .user-menu {
+      padding: vars.$spacing-xs vars.$spacing-sm;
+    }
+  }
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background-color: vars.$color-white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  padding: vars.$spacing-xs 0;
+  min-width: 200px;
+  z-index: vars.$z-index-dropdown;
+  animation: dropdown-appear 0.2s ease-out;
+  transform-origin: top right;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    background-color: vars.$color-white;
+    transform: rotate(45deg);
+    box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.05);
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      a, button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: vars.$spacing-sm vars.$spacing-md;
+        color: vars.$color-gray-800;
+        text-decoration: none;
+        font-size: vars.$font-size-sm;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        background: none;
+        border: none;
+        cursor: pointer;
+        
+        &:hover {
+          background-color: vars.$color-gray-100;
+          color: vars.$color-black;
+        }
+      }
+      
+      &:not(:last-child) {
+        border-bottom: 1px solid vars.$color-gray-100;
+      }
+      
+      &:last-child button {
+        color: vars.$color-gray-600;
+        font-weight: 500;
+        
+        &:hover {
+          background-color: rgba(220, 53, 69, 0.1);
+          color: #dc3545;
+        }
+      }
+    }
+  }
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

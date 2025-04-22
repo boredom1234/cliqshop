@@ -1,0 +1,132 @@
+@use '../../../../styles/variables' as vars;
+
+.footer {
+  background-color: vars.$color-gray-100;
+  padding: vars.$spacing-xl 0 vars.$spacing-md;
+  margin-top: vars.$spacing-xl * 2;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 vars.$spacing-md;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: vars.$spacing-xl;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 250px;
+}
+
+.footer-heading {
+  font-size: vars.$font-size-lg;
+  margin-bottom: vars.$spacing-md;
+  color: vars.$color-black;
+  font-weight: 500;
+}
+
+.footer-text {
+  color: vars.$color-gray-700;
+  line-height: 1.6;
+  margin-bottom: vars.$spacing-md;
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: vars.$spacing-md;
+  margin-top: vars.$spacing-md;
+}
+
+.social-link {
+  font-size: vars.$font-size-sm;
+  font-weight: 500;
+  color: vars.$color-gray-700;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  
+  &:hover {
+    color: vars.$color-black;
+    text-decoration: underline;
+  }
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  
+  li {
+    margin-bottom: vars.$spacing-sm;
+  }
+}
+
+.footer-link {
+  color: vars.$color-gray-700;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  
+  &:hover {
+    color: vars.$color-black;
+    text-decoration: underline;
+  }
+}
+
+.newsletter-form {
+  display: flex;
+  margin-top: vars.$spacing-md;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: vars.$spacing-sm;
+  border: 1px solid vars.$color-gray-300;
+  background-color: vars.$color-white;
+  outline: none;
+  font-family: vars.$font-primary;
+  font-size: vars.$font-size-base;
+  
+  &:focus {
+    border-color: vars.$color-gray-500;
+  }
+}
+
+.newsletter-button {
+  background-color: vars.$color-black;
+  color: vars.$color-white;
+  border: none;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  cursor: pointer;
+  font-family: vars.$font-primary;
+  font-size: vars.$font-size-base;
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background-color: vars.$color-gray-800;
+  }
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: vars.$spacing-xl auto 0;
+  padding: vars.$spacing-md;
+  text-align: center;
+  border-top: 1px solid vars.$color-gray-300;
+  color: vars.$color-gray-600;
+  font-size: vars.$font-size-sm;
+}
+
+@media (max-width: vars.$breakpoint-md) {
+  .footer-container {
+    flex-direction: column;
+    gap: vars.$spacing-lg;
+  }
+  
+  .footer-section {
+    flex: auto;
+    width: 100%;
+  }
+}

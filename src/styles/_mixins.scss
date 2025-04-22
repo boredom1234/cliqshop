@@ -1,0 +1,33 @@
+@use 'variables' as vars;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin grid-center {
+  display: grid;
+  place-items: center;
+}
+
+@mixin responsive($breakpoint) {
+  @media screen and (min-width: $breakpoint) {
+    @content;
+  }
+}
+
+@mixin outlined-button {
+  border: 1px solid vars.$color-black;
+  background: transparent;
+  padding: vars.$spacing-sm vars.$spacing-lg;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: vars.$color-black;
+    color: vars.$color-white;
+  }
+} 

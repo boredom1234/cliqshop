@@ -1,0 +1,54 @@
+<header class="header">
+  <div class="header-container">
+    <div class="logo">
+      <a routerLink="/">CLIQSHOP</a>
+    </div>
+    <nav class="nav-links">
+      <ul>
+        <li>
+          <a
+            routerLink="/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            >Home</a
+          >
+        </li>
+        <li><a routerLink="/products" routerLinkActive="active">Shop</a></li>
+      </ul>
+    </nav>
+    <div class="user-actions">
+      <a routerLink="/cart" class="cart-button" aria-label="Shopping Cart">
+        <i class="fa fa-shopping-cart"></i>
+        <ng-container *ngIf="cartItemCount$ | async as count">
+          <span class="cart-count" *ngIf="count > 0">{{ count }}</span>
+        </ng-container>
+      </a>
+
+      <ng-container *ngIf="isLoggedIn$ | async as isLoggedIn; else loginLink">
+        <div class="user-menu-container">
+          <button class="user-menu" (click)="toggleUserMenu()">
+            <!-- <i class="fa fa-user"></i> -->
+            <span class="user-name">{{ userName$ | async }}</span>
+          </button>
+          <div class="user-dropdown" *ngIf="showUserMenu">
+            <ul>
+              <li><a routerLink="/user/profile">My Profile</a></li>
+              <li><a routerLink="/user/orders">My Orders</a></li>
+              <li *ngIf="isAdmin$ | async">
+                <a routerLink="/admin/dashboard">Admin Dashboard</a>
+              </li>
+              <li *ngIf="isStaff$ | async">
+                <a routerLink="/admin/dashboard">Staff Dashboard</a>
+              </li>
+              <li><button (click)="logout()">Logout</button></li>
+            </ul>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #loginLink>
+        <a routerLink="/auth/login" class="auth-link">Sign In</a>
+      </ng-template>
+    </div>
+  </div>
+</header>

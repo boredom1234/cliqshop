@@ -1,0 +1,208 @@
+<div class="product-form-container">
+  <div class="product-form-header">
+    <h2 class="product-form-title">Edit Product</h2>
+  </div>
+  
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loadingProduct">
+    <p>Loading product information...</p>
+  </div>
+  
+  <!-- Not Found State -->
+  <div class="not-found" *ngIf="notFound">
+    <p>Product not found. The product may have been deleted or you may have entered an invalid ID.</p>
+    <button class="btn-back" routerLink="/admin/products">Back to Products</button>
+  </div>
+  
+  <!-- Alert Messages -->
+  <div class="alert alert-success" *ngIf="success">
+    Product has been updated successfully! Redirecting...
+  </div>
+  
+  <div class="alert alert-success" *ngIf="deleteSuccess">
+    Product has been deleted successfully! Redirecting...
+  </div>
+  
+  <div class="alert alert-danger" *ngIf="error">
+    {{ error }}
+  </div>
+  
+  <!-- Product Form -->
+  <form 
+    [formGroup]="productForm" 
+    (ngSubmit)="onSubmit()" 
+    class="product-form" 
+    *ngIf="!loadingProduct && !notFound"
+  >
+    <div class="form-grid">
+      <!-- Name -->
+      <div class="form-group">
+        <label for="name">Product Name*</label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name" 
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('name')"
+        >
+        <div class="error-message" *ngIf="isFieldInvalid('name')">
+          {{ getErrorMessage('name') }}
+        </div>
+      </div>
+      
+      <!-- Category -->
+      <div class="form-group">
+        <label for="category">Category*</label>
+        <select 
+          id="category" 
+          formControlName="category" 
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('category')"
+        >
+          <option value="">Select a category</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="isFieldInvalid('category')">
+          {{ getErrorMessage('category') }}
+        </div>
+      </div>
+      
+      <!-- Price -->
+      <div class="form-group">
+        <label for="price">Price ($)*</label>
+        <input 
+          type="number" 
+          id="price" 
+          formControlName="price" 
+          step="0.01" 
+          min="0.01"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('price')"
+        >
+        <div class="error-message" *ngIf="isFieldInvalid('price')">
+          {{ getErrorMessage('price') }}
+        </div>
+      </div>
+      
+      <!-- Stock -->
+      <div class="form-group">
+        <label for="stock">Stock*</label>
+        <input 
+          type="number" 
+          id="stock" 
+          formControlName="stock" 
+          step="1" 
+          min="0"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('stock')"
+        >
+        <div class="error-message" *ngIf="isFieldInvalid('stock')">
+          {{ getErrorMessage('stock') }}
+        </div>
+      </div>
+      
+      <!-- Image URL -->
+      <div class="form-group full-width">
+        <label for="imageUrl">Image URL*</label>
+        <input 
+          type="url" 
+          id="imageUrl" 
+          formControlName="imageUrl" 
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('imageUrl')"
+          placeholder="https://example.com/image.jpg"
+        >
+        <div class="error-message" *ngIf="isFieldInvalid('imageUrl')">
+          {{ getErrorMessage('imageUrl') }}
+        </div>
+        
+        <!-- Image Preview -->
+        <div class="image-preview-container" *ngIf="productForm.get('imageUrl')?.value">
+          <div class="image-preview-header">
+            <label>Image Preview</label>
+            <button 
+              type="button" 
+              class="refresh-preview" 
+              (click)="refreshImagePreview()" 
+              title="Refresh preview"
+            >
+              <span>↻ Refresh</span>
+            </button>
+          </div>
+          <div class="image-preview">
+            <img 
+              [src]="imagePreviewUrl || productForm.get('imageUrl')?.value" 
+              alt="Product image preview"
+              (error)="handleImageError($event)"
+            >
+            <div class="image-error" *ngIf="imageLoadError">
+              <p>Unable to load image from the provided URL.</p>
+              <p>Please check if the URL is correct and accessible.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Description -->
+      <div class="form-group full-width">
+        <label for="description">Description*</label>
+        <textarea 
+          id="description" 
+          formControlName="description" 
+          rows="5"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('description')"
+        ></textarea>
+        <div class="error-message" *ngIf="isFieldInvalid('description')">
+          {{ getErrorMessage('description') }}
+        </div>
+      </div>
+      
+      <!-- Active Status -->
+      <!-- <div class="form-group full-width">
+        <div class="checkbox-container">
+          <input 
+            type="checkbox" 
+            id="active" 
+            formControlName="active"
+          >
+          <label for="active" class="checkbox-label">Product is active (visible to customers)</label>
+        </div>
+      </div> -->
+    </div>
+    
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn-delete" 
+        (click)="confirmDelete()"
+        [disabled]="loading || isDeleting"
+      >
+        <span *ngIf="isDeleting">Deleting...</span>
+        <span *ngIf="!isDeleting">Delete Product</span>
+      </button>
+      <div class="spacer"></div>
+      <button 
+        type="button" 
+        class="btn-cancel" 
+        routerLink="/admin/products"
+        [disabled]="loading || isDeleting"
+      >
+        Cancel
+      </button>
+      <button 
+        type="submit" 
+        class="btn-submit" 
+        [disabled]="loading || isDeleting"
+      >
+        <span *ngIf="loading">Updating...</span>
+        <span *ngIf="!loading">Update Product</span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Delete Confirmation Modal (placed as a sibling to the main container, not inside it) -->
+<!-- Modal is now created programmatically and appended directly to the document body -->

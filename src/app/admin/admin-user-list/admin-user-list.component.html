@@ -1,0 +1,178 @@
+<div class="user-list">
+  <div class="user-list__header">
+    <h2 class="user-list__title">{{ isStaffUser ? 'Customer Management' : 'User Management' }}</h2>
+    
+    <div class="user-filters" *ngIf="!isStaffUser">
+      <div class="filter-group">
+        <label for="role-filter">Filter by Role:</label>
+        <select id="role-filter" (change)="filterByRole($any($event.target).value)">
+          <option value="">All Roles</option>
+          <option value="ADMIN">Admin</option>
+          <option value="STAFF">Staff</option>
+          <option value="USER">User</option>
+        </select>
+      </div>
+      
+      <div class="sort-buttons">
+        <button class="sort-button" (click)="sortByRole()">
+          Sort by Role
+        </button>
+        <!-- <button class="sort-button" (click)="sortByStatus()">
+          Sort by Status
+        </button> -->
+        <button class="sort-button reset" (click)="resetFilters()">
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Filter indicator for admin users -->
+  <div class="filter-indicator" *ngIf="roleFilter && !isStaffUser">
+    <p>Filtered by role: <strong>{{ roleFilter }}</strong></p>
+    <button class="clear-filter" (click)="resetFilters()">Clear Filter</button>
+  </div>
+  
+  <!-- Error alert -->
+  <div class="alert alert-danger" *ngIf="error">
+    {{ error }}
+  </div>
+  
+  <!-- Users table -->
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th *ngIf="!isStaffUser">Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="6" class="loading">Loading users...</td>
+        </tr>
+        <tr *ngFor="let user of users">
+          <td>{{ user.id }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.name }}</td>
+          <td *ngIf="!isStaffUser">
+            <span class="role" [ngClass]="user.role === 'ADMIN' ? 'admin' : user.role === 'STAFF' ? 'staff' : 'user'">
+              {{ user.role }}
+            </span>
+          </td>
+          <td>
+            <span class="status" [ngClass]="{'status--active': !user.accountLocked, 'status--locked': user.accountLocked}">
+              {{ user.accountLocked ? 'LOCKED' : user.accountStatus || 'ACTIVE' }}
+            </span>
+          </td>
+          <td>
+            <div class="actions">
+              <button 
+                class="action-button update"
+                [disabled]="processingUserId === user.id"
+                (click)="updateUserRole(user.id, getAlternateRole(user.role))"
+                *ngIf="!isStaffUser"
+              >
+                <span *ngIf="processingUserId !== user.id">
+                  Make {{ getAlternateRole(user.role) }}
+                </span>
+                <span *ngIf="processingUserId === user.id">
+                  Processing...
+                </span>
+              </button>
+              
+              <button 
+                class="action-button view"
+                (click)="openUserModal(user)"
+              >
+                {{ isStaffUser ? 'View Details' : 'Manage' }}
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && users.length === 0">
+          <td colspan="6" class="no-data">No users found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- User Details Modal -->
+  <div class="modal" *ngIf="modalVisible">
+    <div class="modal-backdrop" (click)="closeModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ isStaffUser ? 'Customer Details' : 'Manage User Account' }}</h3>
+        <button class="close-button" (click)="closeModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body" *ngIf="selectedUser">
+        <!-- User Information Section -->
+        <div class="user-info">
+          <h4>Account Information</h4>
+          <div class="info-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ selectedUser.email }}</span>
+          </div>
+          <div class="info-row" *ngIf="!isStaffUser">
+            <span class="label">Role:</span>
+            <span class="value">
+              <span class="role" [ngClass]="selectedUser.role === 'ADMIN' ? 'admin' : selectedUser.role === 'STAFF' ? 'staff' : 'user'">
+                {{ selectedUser.role }}
+              </span>
+            </span>
+          </div>
+        </div>
+        
+        <!-- Edit Profile Form -->
+        <div class="user-profile-form">
+          <h4>Update Profile</h4>
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" [(ngModel)]="profileUpdateData.name" placeholder="Full Name" [disabled]="isStaffUser">
+          </div>
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" id="address" [(ngModel)]="profileUpdateData.address" placeholder="Address" [disabled]="isStaffUser">
+          </div>
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="text" id="phoneNumber" [(ngModel)]="profileUpdateData.phoneNumber" placeholder="Phone Number" [disabled]="isStaffUser">
+          </div>
+          <button 
+            class="action-button update"
+            [disabled]="processingUserId === selectedUser.id || isStaffUser"
+            (click)="updateUserProfile()"
+            *ngIf="!isStaffUser"
+          >
+            Update Profile
+          </button>
+        </div>
+        
+        <!-- Password Reset Section -->
+        <div class="password-reset" *ngIf="!isStaffUser">
+          <h4>Reset Password</h4>
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input 
+              type="password" 
+              id="newPassword" 
+              [(ngModel)]="newPassword" 
+              placeholder="Enter new password">
+          </div>
+          <button 
+            class="action-button"
+            [disabled]="processingUserId === selectedUser.id || !newPassword"
+            (click)="resetPassword()"
+          >
+            Reset Password
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

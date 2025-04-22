@@ -1,0 +1,223 @@
+@use '../../../styles/variables' as vars;
+@use '../../../styles/mixins' as mix;
+
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: vars.$background-color;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  border-radius: 12px;
+  background-color: vars.$white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.auth-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: vars.$text-color-dark;
+  text-align: center;
+}
+
+.auth-subtitle {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: vars.$text-color-muted;
+  text-align: center;
+}
+
+.auth-form {
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: vars.$text-color-dark;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: vars.$text-color-dark;
+  background-color: vars.$white;
+  border: 1px solid vars.$border-color;
+  border-radius: 8px;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:focus {
+    border-color: vars.$primary-color;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(vars.$primary-color, 0.15);
+  }
+
+  &.is-invalid {
+    border-color: vars.$danger-color;
+  }
+
+  &[readonly] {
+    background-color: vars.$background-color-light;
+    cursor: not-allowed;
+  }
+}
+
+.password-input {
+  position: relative;
+
+  .form-control {
+    padding-right: 3rem;
+  }
+
+  .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: vars.$text-color-muted;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    
+    &:hover, &:focus {
+      color: vars.$text-color-dark;
+      outline: none;
+    }
+  }
+}
+
+.otp-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.password-hint {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: vars.$text-color-muted;
+  line-height: 1.4;
+}
+
+.invalid-feedback {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  color: vars.$danger-color;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  color: vars.$white;
+  background-color: vars.$primary-color;
+  border-color: vars.$primary-color;
+
+  &:hover:not(:disabled) {
+    background-color: darken(vars.$primary-color, 7.5%);
+    border-color: darken(vars.$primary-color, 10%);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.btn-link {
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: vars.$primary-color;
+  text-decoration: none;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: darken(vars.$primary-color, 10%);
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    color: vars.$text-color-muted;
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.alert-danger {
+  color: darken(vars.$danger-color, 20%);
+  background-color: lighten(vars.$danger-color, 35%);
+  border-color: lighten(vars.$danger-color, 30%);
+}
+
+.alert-success {
+  color: darken(vars.$success-color, 20%);
+  background-color: lighten(vars.$success-color, 45%);
+  border-color: lighten(vars.$success-color, 40%);
+}
+
+.auth-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 0.2em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}

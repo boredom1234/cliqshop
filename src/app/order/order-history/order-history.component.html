@@ -1,0 +1,57 @@
+<div class="order-history-container">
+  <header class="page-header">
+    <h1>Order History</h1>
+    <button class="refresh-button" (click)="refreshOrders()">
+      <i class="fa fa-refresh"></i> Refresh
+    </button>
+  </header>
+
+  <div class="order-list-container">
+    <!-- Loading state -->
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Loading your orders...</p>
+    </div>
+
+    <!-- Error state -->
+    <div class="error-state" *ngIf="error">
+      <i class="fa fa-exclamation-circle"></i>
+      <p>Unable to load your orders. Please try again.</p>
+      <button class="retry-button" (click)="refreshOrders()">Retry</button>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="(orders$ | async)?.length === 0 && !loading && !error">
+      <div class="empty-icon">
+        <i class="fa fa-shopping-bag"></i>
+      </div>
+      <h2>No orders yet</h2>
+      <p>You haven't placed any orders yet. Start shopping to see your orders here.</p>
+      <a routerLink="/products" class="shop-now-button">Shop Now</a>
+    </div>
+
+    <!-- Orders list -->
+    <ng-container *ngIf="(orders$ | async) as orders">
+      <div class="orders-list" *ngIf="orders.length > 0">
+        <div class="order-card" *ngFor="let order of orders">
+          <div class="order-header">
+            <div class="order-info">
+              <h3>Order #{{ order.orderId }}</h3>
+              <p class="order-date">Placed on {{ formatDate(order.createdAt) }}</p>
+            </div>
+            <div class="order-status">
+              <span [ngClass]="getStatusClass(order.status)">{{ order.status }}</span>
+            </div>
+          </div>
+          <div class="order-summary">
+            <div class="order-details">
+              <p>{{ order.items.length }} item(s)</p>
+              <p class="order-total">Total: {{ formatCurrency(order.summary.total) }}</p>
+            </div>
+            <a [routerLink]="['/order/order', order.id]" class="view-details-button">View Details</a>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

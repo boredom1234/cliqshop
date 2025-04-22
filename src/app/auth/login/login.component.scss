@@ -1,0 +1,211 @@
+@use '../../../styles/variables' as vars;
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: vars.$spacing-md;
+  position: relative;
+  background-image: url('https://i.imgur.com/Q2XZxIb.png');
+  background-size: cover;
+  background-position: center;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6); /* Dark overlay for readability */
+    z-index: 1;
+  }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  background-color: vars.$color-white;
+  border: 1px solid vars.$color-gray-200;
+  border-radius: 4px;
+  padding: vars.$spacing-xl;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 2; /* Place above the overlay */
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: vars.$spacing-lg;
+}
+
+.auth-title {
+  font-size: vars.$font-size-2xl;
+  color: vars.$color-black;
+  margin-bottom: vars.$spacing-xs;
+  font-weight: 500;
+}
+
+.auth-subtitle {
+  color: vars.$color-gray-600;
+  font-size: vars.$font-size-sm;
+}
+
+.auth-form {
+  margin-bottom: vars.$spacing-lg;
+}
+
+.form-group {
+  margin-bottom: vars.$spacing-md;
+}
+
+label {
+  display: block;
+  margin-bottom: vars.$spacing-xs;
+  color: vars.$color-gray-800;
+  font-size: vars.$font-size-sm;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: vars.$spacing-sm;
+  font-size: vars.$font-size-base;
+  border: 1px solid vars.$color-gray-300;
+  border-radius: 4px;
+  background-color: vars.$color-white;
+  transition: border-color 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: vars.$color-gray-700;
+  }
+  
+  &.is-invalid {
+    border-color: #dc3545;
+  }
+}
+
+.password-input {
+  position: relative;
+  
+  .toggle-password {
+    position: absolute;
+    right: vars.$spacing-sm;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: vars.$color-gray-500;
+    
+    &:hover {
+      color: vars.$color-gray-700;
+    }
+  }
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: vars.$font-size-xs;
+  margin-top: vars.$spacing-xs;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: vars.$spacing-md;
+  
+  .remember-me {
+    display: flex;
+    align-items: center;
+    
+    input[type="checkbox"] {
+      margin-right: vars.$spacing-xs;
+    }
+    
+    label {
+      margin-bottom: 0;
+      font-weight: normal;
+      font-size: vars.$font-size-sm;
+    }
+  }
+  
+  .forgot-password {
+    color: vars.$color-gray-700;
+    font-size: vars.$font-size-sm;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+      color: vars.$color-black;
+    }
+  }
+}
+
+.error-message {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  padding: vars.$spacing-sm;
+  border-radius: 4px;
+  margin-bottom: vars.$spacing-md;
+  font-size: vars.$font-size-sm;
+}
+
+.success-message {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: vars.$spacing-sm;
+  border-radius: 4px;
+  margin-bottom: vars.$spacing-md;
+  font-size: vars.$font-size-sm;
+}
+
+.auth-button {
+  width: 100%;
+  padding: vars.$spacing-sm;
+  background-color: vars.$color-black;
+  color: vars.$color-white;
+  border: none;
+  border-radius: 4px;
+  font-size: vars.$font-size-base;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: vars.$color-gray-800;
+  }
+  
+  &:disabled {
+    background-color: vars.$color-gray-500;
+    cursor: not-allowed;
+  }
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: vars.$spacing-lg;
+  color: vars.$color-gray-600;
+  font-size: vars.$font-size-sm;
+  
+  a {
+    color: vars.$color-black;
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Media queries
+@media (max-width: vars.$breakpoint-sm) {
+  .auth-card {
+    padding: vars.$spacing-lg;
+  }
+}

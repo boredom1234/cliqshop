@@ -1,0 +1,148 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.product-form-container {
+  background-color: $color-white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: $spacing-lg;
+}
+
+.product-form-header {
+  margin-bottom: $spacing-xl;
+  
+  .product-form-title {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.alert {
+  padding: $spacing-md;
+  border-radius: 4px;
+  margin-bottom: $spacing-lg;
+  
+  &.alert-success {
+    background-color: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    color: #1e7e34;
+  }
+  
+  &.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    color: #b21f2d;
+  }
+}
+
+.product-form {
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-lg;
+    
+    @media (max-width: $breakpoint-md) {
+      grid-template-columns: 1fr;
+    }
+    
+    .full-width {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.form-group {
+  margin-bottom: $spacing-md;
+  
+  label {
+    display: block;
+    margin-bottom: $spacing-xs;
+    font-weight: 500;
+    font-size: $font-size-sm;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid $color-gray-300;
+    border-radius: 4px;
+    font-size: $font-size-base;
+    transition: border-color 0.2s;
+    
+    &:focus {
+      outline: none;
+      border-color: $color-gray-700;
+    }
+    
+    &.is-invalid {
+      border-color: #dc3545;
+    }
+  }
+  
+  select.form-control {
+    height: 38px;
+  }
+  
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    font-size: $font-size-sm;
+    margin-top: $spacing-xs;
+  }
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  
+  input[type="checkbox"] {
+    margin-right: $spacing-sm;
+  }
+  
+  .checkbox-label {
+    margin-bottom: 0;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+  
+  button {
+    padding: $spacing-sm $spacing-lg;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+  
+  .btn-cancel {
+    background-color: transparent;
+    border: 1px solid $color-gray-300;
+    color: $color-gray-700;
+    
+    &:hover:not(:disabled) {
+      background-color: $color-gray-100;
+    }
+  }
+  
+  .btn-submit {
+    background-color: $color-gray-900;
+    border: 1px solid $color-gray-900;
+    color: $color-white;
+    
+    &:hover:not(:disabled) {
+      background-color: $color-gray-800;
+    }
+  }
+}

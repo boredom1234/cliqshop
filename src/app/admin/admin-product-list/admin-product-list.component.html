@@ -1,0 +1,101 @@
+<div class="product-list" style="width: 100%; display: block; visibility: visible !important; border: 1px solid #eee; box-sizing: border-box; padding: 20px; background-color: #fff; color: #000;">
+  <!-- Debug Info -->
+  <!-- <div class="debug-info">
+    <h3>Debug Information</h3>
+    <div><strong>Loading:</strong> {{ loading ? 'Yes' : 'No' }}</div>
+    <div><strong>Products:</strong> {{ products?.length || 0 }}</div>
+    <div><strong>Total products:</strong> {{ totalProducts || 0 }}</div>
+    <div *ngIf="error"><strong>Error:</strong> {{ error }}</div>
+    <div><strong>Raw Data:</strong> API returns 'active' as null for all products</div>
+  </div> -->
+
+  <!-- Header -->
+  <div class="product-list__header">
+    <h2>Products ({{ totalProducts || 0 }})</h2>
+    
+    <div class="product-list__actions">
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (keyup.enter)="search()" 
+          placeholder="Search products..." 
+          class="search-input"
+        >
+      </div>
+      
+      <a routerLink="/admin/products/add" class="add-button">
+        Add Product
+      </a>
+    </div>
+  </div>
+  
+  <!-- Table -->
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>SKU</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading" class="loading">
+          <td colspan="5">Loading products...</td>
+        </tr>
+        
+        <tr *ngIf="!loading && (!products || products.length === 0)" class="no-data">
+          <td colspan="5">No products found.</td>
+        </tr>
+        
+        <tr *ngFor="let product of products">
+          <td>
+            <div class="product-cell">
+              <div class="product-image" [style.background-image]="'url(' + (product?.imageUrl || '') + ')'"></div>
+              <div class="product-info">
+                <div class="product-name">{{ product?.name || 'Unknown Product' }}</div>
+                <div class="product-category">{{ product?.category || 'Uncategorized' }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ product?.sku || 'N/A' }}</td>
+          <td>{{ product?.price | currency }}</td>
+          <td>{{ product?.stock || 0 }}</td>
+          <td>
+            <div class="actions">
+              <a [routerLink]="['/admin/products/edit', product?.id]" class="action-button edit">
+                Edit
+              </a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button 
+      (click)="prevPage()" 
+      [disabled]="currentPage === 0" 
+      class="pagination__button"
+    >
+      &lt;
+    </button>
+    
+    <span class="pagination__item">
+      Page {{ displayPage }} of {{ totalPages }}
+    </span>
+    
+    <button 
+      (click)="nextPage()" 
+      [disabled]="currentPage === totalPages - 1" 
+      class="pagination__button"
+    >
+      &gt;
+    </button>
+  </div>
+</div>

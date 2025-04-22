@@ -1,0 +1,41 @@
+<div class="charts-container">
+  <!-- Dashboard Charts Section -->
+  <div class="dashboard-section charts-section revenue-charts">
+    <h3 class="section-title">Revenue & Orders Trends</h3>
+    <div class="charts-grid">
+      <div class="chart-container">
+        <h4 class="chart-title">Daily Revenue</h4>
+        <div class="chart-wrapper">
+          <canvas #revenueCanvas></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <h4 class="chart-title">Daily Orders</h4>
+        <div class="chart-wrapper">
+          <canvas #ordersCanvas></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Product & Status Charts -->
+  <div class="dashboard-section charts-section status-charts">
+    <h3 class="section-title">Performance Analytics</h3>
+    <div class="charts-grid">
+      <div class="chart-container">
+        <h4 class="chart-title">Top Products Performance</h4>
+        <div class="chart-wrapper">
+          <canvas #productsCanvas></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <h4 class="chart-title">Order Status Distribution</h4>
+        <div class="chart-wrapper">
+          <canvas #statusCanvas></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

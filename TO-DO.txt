@@ -1,0 +1,137 @@
+CliqShop To-Do List
+
+1. Environment Setup & Project Initialization
+   [✓] Install Required Tools:
+       [✓] Install Node.js
+       [✓] Install Angular CLI globally (npm install -g @angular/cli)
+   [✓] Create New Angular Project:
+       [✓] Run: ng new cliqshop --routing --style=scss
+       [✓] Navigate into the project folder: cd cliqshop
+   [✓] Initialize Version Control (Optional):
+       [✓] Initialize Git: git init
+       [✓] Commit initial setup
+
+2. Establish Core Project Structure
+   [✓] Create Core Module:
+       [✓] Generate module: ng generate module core
+   [✓] Generate Core Components:
+       [✓] Header: ng generate component core/components/header
+       [✓] Footer: ng generate component core/components/footer
+   [✓] Generate Core Services:
+       [✓] Auth: ng generate service core/services/auth
+       [✓] Product: ng generate service core/services/product
+       [✓] Cart: ng generate service core/services/cart
+       [✓] Order: ng generate service core/services/order
+       [✓] Admin: ng generate service core/services/admin
+   [✓] Generate Route Guards:
+       [✓] AuthGuard: ng generate guard core/guards/auth
+       [✓] AdminGuard: ng generate guard core/guards/admin
+
+3. Create Shared Module
+   [✓] Generate Shared Module:
+       [✓] Run: ng generate module shared
+   [✓] Create Shared Components:
+       [✓] Spinner: ng generate component shared/components/spinner
+       [✓] Modal: ng generate component shared/components/modal
+       [✓] Alert: ng generate component shared/components/alert
+   [✓] Create Shared Pipe:
+       [✓] Currency Format Pipe: ng generate pipe shared/pipes/currencyFormat
+
+4. Develop Feature Modules & Components
+
+   A. Authentication Module:
+   [✓] Generate Auth Module with Routing:
+       [✓] Run: ng generate module auth --routing
+   [✓] Generate Auth Components:
+       [✓] Login: ng generate component auth/login
+       [✓] Register: ng generate component auth/register
+       [✓] Forgot Password: ng generate component auth/forgot-password
+       [✓] Verify OTP: ng generate component auth/verify-otp
+       [✓] Password Reset: ng generate component auth/password-reset
+   [ ] Implement API Integration in AuthService:
+       [ ] Login, registration (send OTP & verify OTP), password reset flows
+
+   B. Products Module:
+   [✓] Generate Products Module with Routing:
+       [✓] Run: ng generate module products --routing
+   [✓] Generate Product Components:
+       [✓] Product List: ng generate component products/product-list
+       [✓] Product Card: ng generate component products/product-card
+       [✓] Product Details: ng generate component products/product-details
+       [✓] Review List: ng generate component products/review-list
+       [✓] Add Review: ng generate component products/add-review
+   [ ] Implement API Integration in ProductService:
+       [ ] Fetch product list, details, search, and reviews
+
+   C. Cart Module:
+   [✓] Generate Cart Module with Routing:
+       [✓] Run: ng generate module cart --routing
+   [✓] Generate Cart Components:
+       [✓] Cart Page: ng generate component cart/cart
+       [✓] Cart Item: ng generate component cart/cart-item
+       [✓] Cart Summary: ng generate component cart/cart-summary
+   [ ] Implement API Integration in CartService:
+       [ ] Get cart items, add, update, and delete operations
+
+   D. Order Module:
+   [✓] Generate Order Module with Routing:
+       [✓] Run: ng generate module order --routing
+   [✓] Generate Order Components:
+       [✓] Checkout: ng generate component order/checkout
+       [✓] Order Details: ng generate component order/order-details
+       [✓] Order History: ng generate component order/order-history
+   [ ] Implement API Integration in OrderService:
+       [ ] Place orders, fetch order details and history
+
+   E. Admin Module:
+   [✓] Generate Admin Module with Routing:
+       [✓] Run: ng generate module admin --routing
+   [✓] Generate Admin Components:
+       [✓] Dashboard: ng generate component admin/admin-dashboard
+       [✓] Product List: ng generate component admin/admin-product-list
+       [✓] Product Add: ng generate component admin/admin-product-add
+       [✓] Product Edit: ng generate component admin/admin-product-edit
+       [✓] Order List: ng generate component admin/admin-order-list
+       [✓] User List: ng generate component admin/admin-user-list
+   [ ] Implement API Integration in AdminService:
+       [ ] Manage products, orders, and user roles
+
+5. Configure Routing & Guards
+   [✓] Set Up App-Level Routing:
+       [✓] Configure app-routing.module.ts to lazy-load all feature modules
+   [✓] Add Route Guards:
+       [✓] Protect user-specific routes with AuthGuard
+       [✓] Protect admin routes with AdminGuard
+
+6. API Integration & HTTP Setup
+   [✓] Import HttpClientModule:
+       [✓] Import into app.module.ts
+   [✓] Implement HTTP Interceptors (Optional):
+       [✓] Append JWT tokens to API requests
+   [✓] Integrate API Endpoints in Each Service:
+       [✓] AuthService, ProductService, CartService, OrderService, AdminService
+
+7. UI/UX & Styling
+   [ ] Design Minimal ZARA-Inspired UI:
+       [ ] Create a monochromatic, outlined style using SCSS
+       [ ] Define global SCSS variables for consistent styling
+   [ ] Ensure Responsive Design:
+       [ ] Use CSS Flexbox/Grid or Angular Flex Layout
+   [ ] Integrate Shared Components:
+       [ ] Use spinner, modal, and alert components across pages
+
+8. Testing & Quality Assurance
+   [ ] Write Unit Tests:
+       [ ] Use Jasmine/Karma for components and services
+   [ ] Write End-to-End Tests:
+       [ ] Use Protractor or Cypress for critical user flows (login, product search, cart, order placement)
+   [ ] Perform Manual Testing:
+       [ ] Validate UI responsiveness and API integrations on multiple devices
+
+9. Deployment Preparation
+   [ ] Configure Environment Files:
+       [ ] Set up development and production API endpoints in src/environments
+   [ ] Build for Production:
+       [ ] Run: ng build --prod
+   [ ] Deploy Application:
+       [ ] Deploy the build output to your hosting service

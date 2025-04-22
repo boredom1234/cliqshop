@@ -1,0 +1,60 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h1 class="auth-title">Sign In</h1>
+    <p class="auth-subtitle">Welcome back to CLIQSHOP</p>
+    
+    <!-- Error Message -->
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="hasError('email')"
+        >
+        <div class="error-message" *ngIf="hasError('email')">
+          {{ getErrorMessage('email') }}
+        </div>
+      </div>
+      
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password"
+          class="form-control"
+          [class.is-invalid]="hasError('password')"
+        >
+        <div class="error-message" *ngIf="hasError('password')">
+          {{ getErrorMessage('password') }}
+        </div>
+        <div class="forgot-password">
+          <a routerLink="/auth/forgot-password">Forgot Password?</a>
+        </div>
+      </div>
+      
+      <!-- Login Button -->
+      <button 
+        type="submit" 
+        class="btn btn-primary btn-block"
+        [disabled]="isLoading"
+      >
+        <span *ngIf="isLoading">Signing in...</span>
+        <span *ngIf="!isLoading">Sign In</span>
+      </button>
+    </form>
+    
+    <div class="auth-footer">
+      <p>Don't have an account? <a routerLink="/auth/register">Create Account</a></p>
+    </div>
+  </div>
+</div>

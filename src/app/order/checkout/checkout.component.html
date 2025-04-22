@@ -1,0 +1,437 @@
+<div class="checkout-container" *ngIf="(cart$ | async) as cart">
+  <!-- Checkout header -->
+  <div class="checkout-header">
+    <h1 class="checkout-title">Checkout</h1>
+  </div>
+  
+  <!-- Checkout content -->
+  <div class="checkout-content">
+    <!-- Checkout steps -->
+    <div class="checkout-steps">
+      <div class="step" 
+        *ngFor="let step of [steps.SHIPPING, steps.BILLING, steps.PAYMENT, steps.REVIEW]; let i = index"
+        [class.active]="currentStep === step"
+        [class.completed]="currentStep > step"
+      >
+        <div class="step-number">{{ i + 1 }}</div>
+        <div class="step-label">
+          {{ 
+            step === steps.SHIPPING ? 'Shipping' : 
+            step === steps.BILLING ? 'Billing' : 
+            step === steps.PAYMENT ? 'Payment' : 'Review' 
+          }}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step forms -->
+    <div class="checkout-form-container">
+      <!-- Shipping form -->
+      <div class="form-step" *ngIf="currentStep === steps.SHIPPING">
+        <h2>Shipping Information</h2>
+        <form [formGroup]="shippingForm" class="checkout-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" formControlName="firstName" class="form-control"
+                [ngClass]="{'is-invalid': submitted && sf['firstName'].errors}">
+              <div *ngIf="submitted && sf['firstName'].errors" class="invalid-feedback">
+                <div *ngIf="sf['firstName'].errors['required']">First name is required</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" formControlName="lastName" class="form-control"
+                [ngClass]="{'is-invalid': submitted && sf['lastName'].errors}">
+              <div *ngIf="submitted && sf['lastName'].errors" class="invalid-feedback">
+                <div *ngIf="sf['lastName'].errors['required']">Last name is required</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" formControlName="email" class="form-control"
+                [ngClass]="{'is-invalid': submitted && sf['email'].errors}">
+              <div *ngIf="submitted && sf['email'].errors" class="invalid-feedback">
+                <div *ngIf="sf['email'].errors['required']">Email is required</div>
+                <div *ngIf="sf['email'].errors['email']">Please enter a valid email</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" formControlName="phone" class="form-control"
+                [ngClass]="{'is-invalid': submitted && sf['phone'].errors}" placeholder="9876543210">
+              <div *ngIf="submitted && sf['phone'].errors" class="invalid-feedback">
+                <div *ngIf="sf['phone'].errors['required']">Phone number is required</div>
+                <div *ngIf="sf['phone'].errors['pattern']">Please enter a valid 10-digit phone number</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="addressLine1">Address Line 1</label>
+            <input type="text" id="addressLine1" formControlName="addressLine1" class="form-control"
+              [ngClass]="{'is-invalid': submitted && sf['addressLine1'].errors}">
+            <div *ngIf="submitted && sf['addressLine1'].errors" class="invalid-feedback">
+              <div *ngIf="sf['addressLine1'].errors['required']">Address is required</div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="addressLine2">Address Line 2 (Optional)</label>
+            <input type="text" id="addressLine2" formControlName="addressLine2" class="form-control">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" formControlName="city" class="form-control"
+                [ngClass]="{'is-invalid': submitted && sf['city'].errors}">
+              <div *ngIf="submitted && sf['city'].errors" class="invalid-feedback">
+                <div *ngIf="sf['city'].errors['required']">City is required</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="state">State</label>
+              <input type="text" id="state" formControlName="state" class="form-control"
+                [ngClass]="{'is-invalid': submitted && sf['state'].errors}">
+              <div *ngIf="submitted && sf['state'].errors" class="invalid-feedback">
+                <div *ngIf="sf['state'].errors['required']">State is required</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="postalCode">Postal Code</label>
+              <input type="text" id="postalCode" formControlName="postalCode" class="form-control"
+                [ngClass]="{'is-invalid': submitted && sf['postalCode'].errors}" placeholder="12345">
+              <div *ngIf="submitted && sf['postalCode'].errors" class="invalid-feedback">
+                <div *ngIf="sf['postalCode'].errors['required']">Postal code is required</div>
+                <div *ngIf="sf['postalCode'].errors['pattern']">Please enter a valid postal code (5 digits or ZIP+4)</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input type="text" id="country" formControlName="country" class="form-control"
+                [ngClass]="{'is-invalid': submitted && sf['country'].errors}">
+              <div *ngIf="submitted && sf['country'].errors" class="invalid-feedback">
+                <div *ngIf="sf['country'].errors['required']">Country is required</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="sameBilling" (change)="toggleSameBillingAddress()" [checked]="sameBillingAddress">
+              <label for="sameBilling">Billing address is the same as shipping address</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Billing form -->
+      <div class="form-step" *ngIf="currentStep === steps.BILLING">
+        <h2>Billing Information</h2>
+        <form [formGroup]="billingForm" class="checkout-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="billingFirstName">First Name</label>
+              <input type="text" id="billingFirstName" formControlName="firstName" class="form-control"
+                [ngClass]="{'is-invalid': submitted && bf['firstName'].errors}">
+              <div *ngIf="submitted && bf['firstName'].errors" class="invalid-feedback">
+                <div *ngIf="bf['firstName'].errors['required']">First name is required</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="billingLastName">Last Name</label>
+              <input type="text" id="billingLastName" formControlName="lastName" class="form-control"
+                [ngClass]="{'is-invalid': submitted && bf['lastName'].errors}">
+              <div *ngIf="submitted && bf['lastName'].errors" class="invalid-feedback">
+                <div *ngIf="bf['lastName'].errors['required']">Last name is required</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="billingEmail">Email</label>
+              <input type="email" id="billingEmail" formControlName="email" class="form-control"
+                [ngClass]="{'is-invalid': submitted && bf['email'].errors}">
+              <div *ngIf="submitted && bf['email'].errors" class="invalid-feedback">
+                <div *ngIf="bf['email'].errors['required']">Email is required</div>
+                <div *ngIf="bf['email'].errors['email']">Please enter a valid email</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="billingPhone">Phone</label>
+              <input type="tel" id="billingPhone" formControlName="phone" class="form-control"
+                [ngClass]="{'is-invalid': submitted && bf['phone'].errors}">
+              <div *ngIf="submitted && bf['phone'].errors" class="invalid-feedback">
+                <div *ngIf="bf['phone'].errors['required']">Phone number is required</div>
+                <div *ngIf="bf['phone'].errors['pattern']">Please enter a valid 10-digit phone number</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="billingAddressLine1">Address Line 1</label>
+            <input type="text" id="billingAddressLine1" formControlName="addressLine1" class="form-control"
+              [ngClass]="{'is-invalid': submitted && bf['addressLine1'].errors}">
+            <div *ngIf="submitted && bf['addressLine1'].errors" class="invalid-feedback">
+              <div *ngIf="bf['addressLine1'].errors['required']">Address is required</div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="billingAddressLine2">Address Line 2 (Optional)</label>
+            <input type="text" id="billingAddressLine2" formControlName="addressLine2" class="form-control">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="billingCity">City</label>
+              <input type="text" id="billingCity" formControlName="city" class="form-control"
+                [ngClass]="{'is-invalid': submitted && bf['city'].errors}">
+              <div *ngIf="submitted && bf['city'].errors" class="invalid-feedback">
+                <div *ngIf="bf['city'].errors['required']">City is required</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="billingState">State</label>
+              <input type="text" id="billingState" formControlName="state" class="form-control"
+                [ngClass]="{'is-invalid': submitted && bf['state'].errors}">
+              <div *ngIf="submitted && bf['state'].errors" class="invalid-feedback">
+                <div *ngIf="bf['state'].errors['required']">State is required</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="billingPostalCode">Postal Code</label>
+              <input type="text" id="billingPostalCode" formControlName="postalCode" class="form-control"
+                [ngClass]="{'is-invalid': submitted && bf['postalCode'].errors}">
+              <div *ngIf="submitted && bf['postalCode'].errors" class="invalid-feedback">
+                <div *ngIf="bf['postalCode'].errors['required']">Postal code is required</div>
+                <div *ngIf="bf['postalCode'].errors['pattern']">Please enter a valid postal code (5 digits or ZIP+4)</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="billingCountry">Country</label>
+              <input type="text" id="billingCountry" formControlName="country" class="form-control"
+                [ngClass]="{'is-invalid': submitted && bf['country'].errors}">
+              <div *ngIf="submitted && bf['country'].errors" class="invalid-feedback">
+                <div *ngIf="bf['country'].errors['required']">Country is required</div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Payment form -->
+      <div class="form-step" *ngIf="currentStep === steps.PAYMENT">
+        <h2>Payment Information</h2>
+        
+        <!-- Razorpay payment info (only payment method) -->
+        <div class="razorpay-info">
+          <div class="razorpay-description">
+            <p>Razorpay offers a secure and convenient way to pay online.</p>
+            <!-- <div class="payment-recommendation">
+              <strong>Recommended:</strong> For best results, please use UPI payment method in the Razorpay checkout page.
+            </div> -->
+            <p>You will be able to pay using:</p>
+            <ul class="razorpay-methods">
+              <li class="recommended">
+                <div class="payment-method-item">
+                  <span>UPI</span>
+                  <!-- <span class="badge">Recommended</span> -->
+                </div>
+                <div class="payment-method-icon">
+                  <i class="fa-solid fa-qrcode"></i>
+                </div>
+              </li>
+              <li>
+                <div class="payment-method-item">
+                  <span>Credit/Debit Cards</span>
+                </div>
+                <div class="payment-method-icon">
+                  <i class="fa-regular fa-credit-card"></i>
+                </div>
+              </li>
+              <li>
+                <div class="payment-method-item">
+                  <span>Net Banking</span>
+                </div>
+                <div class="payment-method-icon">
+                  <i class="fa-solid fa-building-columns"></i>
+                </div>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="razorpay-order-summary">
+            <div class="summary-item">
+              <span>Order Total:</span>
+              <span>{{ formatCurrency(orderSummary.total) }}</span>
+            </div>
+          </div>
+          
+          <div class="razorpay-logo">
+            <span class="secure-text">Secured by Razorpay</span>
+          </div>
+
+          <div *ngIf="errorMessage" [ngClass]="{'error-message': !errorMessage.includes('successfully'), 'success-message': errorMessage.includes('successfully')}" class="message-box">
+            {{ errorMessage }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Review order -->
+      <div class="form-step" *ngIf="currentStep === steps.REVIEW">
+        <h2>Review Your Order</h2>
+        
+        <div class="order-section">
+          <h3>Shipping Address</h3>
+          <div class="address-details" *ngIf="shippingForm.valid">
+            <p>
+              {{ shippingForm.value.firstName }} {{ shippingForm.value.lastName }}<br>
+              {{ shippingForm.value.addressLine1 }}<br>
+              <ng-container *ngIf="shippingForm.value.addressLine2">
+                {{ shippingForm.value.addressLine2 }}<br>
+              </ng-container>
+              {{ shippingForm.value.city }}, {{ shippingForm.value.state }} {{ shippingForm.value.postalCode }}<br>
+              {{ shippingForm.value.country }}<br>
+              {{ shippingForm.value.email }}<br>
+              {{ shippingForm.value.phone }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="order-section">
+          <h3>Billing Address</h3>
+          <div class="address-details" *ngIf="billingForm.valid">
+            <p>
+              {{ billingForm.value.firstName }} {{ billingForm.value.lastName }}<br>
+              {{ billingForm.value.addressLine1 }}<br>
+              <ng-container *ngIf="billingForm.value.addressLine2">
+                {{ billingForm.value.addressLine2 }}<br>
+              </ng-container>
+              {{ billingForm.value.city }}, {{ billingForm.value.state }} {{ billingForm.value.postalCode }}<br>
+              {{ billingForm.value.country }}<br>
+              {{ billingForm.value.email }}<br>
+              {{ billingForm.value.phone }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="order-section">
+          <h3>Order Items</h3>
+          <div class="order-items">
+            <div class="order-item" *ngFor="let item of cart.items">
+              <div class="item-image">
+                <img [src]="item.image" [alt]="item.name">
+              </div>
+              <div class="item-details">
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-price">{{ item.price | currency }}</div>
+                <div class="item-quantity">Qty: {{ item.quantity }}</div>
+              </div>
+              <div class="item-total">
+                {{ (item.price * item.quantity) | currency }}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="order-section">
+          <h3>Payment Method</h3>
+          <div class="payment-details">
+            <p>
+              Razorpay<br>
+              <span *ngIf="razorpayPaymentId">Payment ID: {{ razorpayPaymentId }}</span>
+              <span *ngIf="!razorpayPaymentId">Payment will be completed after review</span>
+            </p>
+          </div>
+        </div>
+        
+        <div *ngIf="errorMessage" [ngClass]="{'error-message': true, 'success-message': errorMessage.includes('User details loaded')}">
+          {{ errorMessage }}
+        </div>
+      </div>
+      
+      <!-- Navigation buttons -->
+      <div class="form-buttons">
+        <button type="button" class="btn-secondary" *ngIf="currentStep > 0" (click)="prevStep()">
+          Back
+        </button>
+        <button type="button" class="btn-primary" (click)="nextStep()" [disabled]="loading">
+          <span *ngIf="loading && currentStep === steps.REVIEW" class="spinner"></span>
+          {{ currentStep < steps.REVIEW ? 'Continue' : 'Place Order' }}
+        </button>
+      </div>
+    </div>
+    
+    <!-- Order summary -->
+    <div class="checkout-summary">
+      <div class="summary-card">
+        <h2 class="summary-title">Order Summary</h2>
+        <div class="summary-details">
+          <div class="summary-line">
+            <span>Subtotal ({{ cart.totalItems }} {{ cart.totalItems === 1 ? 'item' : 'items' }})</span>
+            <span>{{ formatCurrency(orderSummary.subtotal) }}</span>
+          </div>
+          <div class="summary-line">
+            <span>Shipping</span>
+            <span>
+              {{ orderSummary.shipping === 0 ? 'Free' : formatCurrency(orderSummary.shipping) }}
+            </span>
+          </div>
+          <div class="summary-line">
+            <span>Tax</span>
+            <span>{{ formatCurrency(orderSummary.tax) }}</span>
+          </div>
+          <div class="summary-total">
+            <span>Total</span>
+            <span>{{ formatCurrency(orderSummary.total) }}</span>
+          </div>
+        </div>
+        
+        <div class="summary-items">
+          <h3>Items in Cart</h3>
+          <div class="summary-item" *ngFor="let item of cart.items">
+            <div class="item-image">
+              <img [src]="item.image" [alt]="item.name">
+            </div>
+            <div class="item-info">
+              <div class="item-name">{{ item.name }}</div>
+              <div class="item-price">{{ item.price | currency }} x {{ item.quantity }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty cart message -->
+<div class="empty-cart-message" *ngIf="(cart$ | async)?.items?.length === 0">
+  <div class="message-container">
+    <div class="empty-cart-icon">
+      <i class="fa fa-shopping-cart"></i>
+    </div>
+    <h2>Your cart is empty</h2>
+    <p>Please add items to your cart before proceeding to checkout.</p>
+    <button class="btn-primary" routerLink="/products">Continue Shopping</button>
+  </div>
+</div>

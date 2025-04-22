@@ -1,0 +1,77 @@
+<app-user-layout>
+  <div class="orders-content">
+    <h2 class="section-title">My Orders</h2>
+    
+    <!-- Show error message if any -->
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your orders...</p>
+    </div>
+
+    <!-- Orders list -->
+    <div *ngIf="!loading" class="orders-container">
+      <div *ngIf="orders.length > 0" class="orders-list">
+        <div class="order-card" *ngFor="let order of orders">
+          <div class="order-header">
+            <div class="order-id">
+              <span class="label">Order ID:</span>
+              <span class="value">{{ order.orderId }}</span>
+            </div>
+            <div class="order-date">
+              <span class="label">Date:</span>
+              <span class="value">{{ formatDate(order.createdAt) }}</span>
+            </div>
+            <div class="order-status">
+              <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                {{ order.status }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="order-summary">
+            <div class="summary-item">
+              <span class="label">Items:</span>
+              <span class="value">{{ order.items.length }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Total:</span>
+              <span class="value price">${{ order.summary.total.toFixed(2) }}</span>
+            </div>
+          </div>
+          
+          <div class="order-items">
+            <h4>Items</h4>
+            <div class="item-list">
+              <div class="item" *ngFor="let item of order.items">
+                <div class="item-image" [style.backgroundImage]="'url(' + item.image + ')'"></div>
+                <div class="item-details">
+                  <div class="item-name">{{ item.name }}</div>
+                  <div class="item-price">${{ item.price.toFixed(2) }} × {{ item.quantity }}</div>
+                  <a *ngIf="order.status === 'delivered'" [routerLink]="['/products', item.productId]" class="review-link">Leave Review</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-actions">
+            <a [routerLink]="['/order/order', order.id]" class="btn-outline">View Order Details</a>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="orders.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <i class="fa-solid fa-cube"></i>
+        </div>
+        <h3>No Orders Yet</h3>
+        <p>You haven't placed any orders yet.</p>
+        <a routerLink="/products" class="btn-primary">Browse Products</a>
+      </div>
+    </div>
+  </div>
+</app-user-layout> 

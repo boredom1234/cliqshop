@@ -1,0 +1,879 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  min-height: 100vh;
+  height: auto !important;
+  will-change: height;
+  transition: min-height 0.1s ease-out;
+  flex: 1 1 auto !important;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  height: auto !important;
+  display: block;
+  background-color: #fff;
+  color: #000;
+  padding: 30px;
+  margin: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+  will-change: min-height;
+  transition: min-height 0.1s ease-out;
+  flex: 1 1 auto !important;
+  border-left: none !important;
+  
+  /* Add a loading state style */
+  &.loading {
+    min-height: 100vh !important;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255,255,255,0.5);
+      z-index: 5;
+    }
+  }
+  
+  /* Ensure minimum height during transitions */
+  &:not(.loading) {
+    min-height: 100vh !important;
+  }
+  
+  &__title {
+    margin-bottom: 40px;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #000;
+    display: block;
+  }
+
+  .debug-info {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #eee;
+    background-color: #fafafa;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    width: 100%;
+    box-sizing: border-box;
+    visibility: visible;
+    display: block;
+
+    small {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 11px;
+      visibility: visible;
+    }
+  }
+}
+
+/* Height filler to ensure minimum content height */
+.height-filler {
+  min-height: 100px;
+  width: 100%;
+  display: block;
+}
+
+.loading-indicator, .error-message {
+  padding: 40px;
+  text-align: center;
+  border: 1px solid #000;
+  margin-bottom: 30px;
+  display: block;
+  min-height: 150px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.error-message {
+  color: #000;
+  border-left: 4px solid #000;
+  background-color: #fff;
+  text-align: left;
+  
+  p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .retry-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #000;
+    color: white;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 20px;
+    
+    &:hover {
+      background-color: #333;
+    }
+  }
+  
+  .troubleshooting-tips {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 0;
+    
+    h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    ul {
+      margin-bottom: 15px;
+      padding-left: 20px;
+      
+      li {
+        margin-bottom: 5px;
+        font-size: 13px;
+        color: #666;
+      }
+    }
+    
+    .action-button {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #000;
+      color: white;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+      text-decoration: none;
+      
+      &:hover {
+        background-color: #333;
+      }
+    }
+  }
+}
+
+/* Ensure stable content maintains height during transitions */
+.stable-content {
+  min-height: calc(100vh - 300px);
+  width: 100%;
+  display: block;
+  position: relative;
+  transition: none;
+  will-change: contents;
+  flex: 1 1 auto !important;
+}
+
+.stats-overview {
+  margin-bottom: 40px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stats-card {
+  background-color: #fff;
+  border: 1px solid #000;
+  padding: 24px;
+  text-align: center;
+  transition: transform 0.3s;
+  
+  &:hover {
+    transform: translateY(-3px);
+  }
+  
+  &__value {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: #000;
+  }
+  
+  &__label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #000;
+    margin: 0;
+  }
+}
+
+.dashboard-section {
+  background-color: #fff;
+  border: 1px solid #000;
+  padding: 24px;
+  margin-bottom: 30px;
+  
+  .section-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #000;
+    border-bottom: 1px solid #000;
+    padding-bottom: 12px;
+    font-weight: 400;
+  }
+}
+
+.order-status-section {
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    
+    @media (max-width: 992px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    @media (max-width: 576px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  .status-card {
+    text-align: center;
+    padding: 20px 15px;
+    border: 1px solid #000;
+    
+    .status-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border: 1px solid #000;
+      margin-bottom: 12px;
+      
+      &.pending, &.confirmed, &.shipped, &.delivered, &.cancelled {
+        background-color: #fff;
+        color: #000;
+      }
+      
+      i {
+        font-size: 24px;
+      }
+    }
+    
+    .status-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      color: #000;
+    }
+    
+    .status-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #000;
+      margin: 0;
+    }
+  }
+}
+
+.performance-section {
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    
+    @media (max-width: 992px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .metric-card {
+    border: 1px solid #000;
+    padding: 20px;
+    
+    .metric-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #000;
+      margin: 0 0 8px;
+    }
+    
+    .metric-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+      color: #000;
+    }
+  }
+}
+
+.inventory-section {
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .inventory-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid #000;
+    
+    .inventory-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border: 1px solid #000;
+      margin-right: 15px;
+      
+      &.low-stock, &.out-of-stock {
+        background-color: #fff;
+        color: #000;
+      }
+      
+      i {
+        font-size: 24px;
+      }
+    }
+    
+    .inventory-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 5px;
+      color: #000;
+    }
+    
+    .inventory-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #000;
+      margin: 0;
+    }
+  }
+}
+
+.top-products-section {
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    
+    @media (max-width: 992px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .product-card {
+    display: flex;
+    border: 1px solid #000;
+    overflow: hidden;
+    
+    .product-image {
+      width: 100px;
+      height: 100px;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .product-details {
+      flex: 1;
+      padding: 15px;
+      
+      .product-name {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 8px;
+        color: #000;
+      }
+      
+      .product-stat {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #000;
+        margin: 0 0 5px;
+      }
+      
+      .product-revenue {
+        font-weight: 700;
+        color: #000;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.top-customers-section {
+  .customers-table-container {
+    overflow-x: auto;
+  }
+  
+  .customers-table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #000;
+    }
+    
+    th {
+      background-color: #fff;
+      font-weight: 600;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 12px;
+    }
+    
+    tr:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
+
+.recent-orders {
+  background: #fff;
+  border: 1px solid #000;
+  padding: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 40px;
+  display: block;
+  min-height: 300px;
+  
+  &__title {
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-weight: 400;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #000;
+    border-bottom: 1px solid #000;
+    padding-bottom: 12px;
+  }
+  
+  .no-data {
+    text-align: center;
+    padding: 40px 20px;
+    border: 1px solid #000;
+    
+    p {
+      margin: 0 0 10px 0;
+      
+      a {
+        color: #000;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 500;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #000;
+  }
+  
+  th {
+    background-color: #fff;
+    font-weight: 500;
+    color: #000;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .status {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    
+    &.pending {
+      background: #fff;
+      color: #000;
+      border: 1px solid #000;
+    }
+    
+    &.confirmed {
+      background: #f5f5f5;
+      color: #000;
+      border: 1px solid #000;
+    }
+    
+    &.shipped {
+      background: #000;
+      color: #fff;
+    }
+    
+    &.delivered {
+      background: #000;
+      color: #fff;
+      border: 1px solid #000;
+    }
+    
+    &.cancelled {
+      background: #fff;
+      color: #000;
+      border: 1px dashed #000;
+    }
+  }
+  
+  .action-button {
+    padding: 6px 12px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    
+    &:hover {
+      background-color: #333;
+    }
+  }
+}
+
+.view-all-link {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  
+  a {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #000;
+    text-decoration: none;
+    display: inline-block;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  
+  .action-button {
+    padding: 6px 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    
+    &.view {
+      background: #000;
+      color: #fff;
+      border: 1px solid #000;
+      
+      &:hover {
+        background: #333;
+      }
+    }
+  }
+}
+
+.emergency-dashboard {
+  display: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix for scrollbar-related width issues */
+:host::-webkit-scrollbar,
+.dashboard::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+/* Make sure content stays at full width and doesn't shrink */
+:host::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* Auto expand the admin dashboard to use available space */
+:host {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+}
+
+.dashboard {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+}
+
+/* Make the dashboard take up all available vertical space */
+:host ::ng-deep app-root,
+:host ::ng-deep app-admin-layout,
+:host ::ng-deep .admin-layout,
+:host ::ng-deep .admin-content,
+:host ::ng-deep .admin-main {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: 100vh !important;
+  height: auto !important;
+}
+
+/* Force full width at all stages of the component hierarchy */
+:host ::ng-deep * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure we can scroll if content overflows */
+:host ::ng-deep .admin-main {
+  overflow-y: auto !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .dashboard {
+    padding: 15px;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .dashboard {
+    padding: 15px;
+    width: 100%;
+    max-width: 100%;
+    
+    &__title {
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+  }
+  
+  .stats-card {
+    padding: 30px 20px;
+    width: 100%;
+    
+    &__value {
+      font-size: 36px;
+    }
+  }
+  
+  .recent-orders {
+    padding: 20px;
+    width: 100%;
+  }
+  
+  .data-table {
+    th, td {
+      padding: 12px;
+      font-size: 13px;
+    }
+  }
+}
+
+.debug-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.debug-button {
+  padding: 8px 12px;
+  background-color: #222;
+  color: white;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 12px;
+  
+  &:hover {
+    background-color: #333;
+  }
+}
+
+.debug-note {
+  font-size: 12px;
+  color: #666;
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-left: 3px solid #000;
+}
+
+.solution-note {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-left: 3px solid #000;
+  margin-bottom: 20px;
+  
+  h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: 500;
+  }
+  
+  p {
+    margin-bottom: 10px;
+  }
+  
+  code {
+    background-color: #f0f0f0;
+    padding: 2px 5px;
+    border: 1px solid #ddd;
+    font-family: monospace;
+    color: #000;
+  }
+  
+  .code-block {
+    background-color: #f8f8f8;
+    border: 1px solid #000;
+    padding: 10px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 12px;
+    color: #000;
+    overflow-x: auto;
+  }
+}
+
+/* User Statistics Section */
+.user-stats-section {
+  margin-top: 20px;
+}
+
+.user-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.user-stats-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.user-stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.user-stats-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+}
+
+.user-stats-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0;
+}

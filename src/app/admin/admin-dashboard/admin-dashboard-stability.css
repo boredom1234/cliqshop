@@ -1,0 +1,186 @@
+/**
+ * Admin Dashboard Stability Fixes
+ * This file contains critical fixes for the dashboard height issue
+ */
+
+/* Force all Angular components to visible and properly sized */
+[ng-version] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+}
+
+/* Establish flex layout for all component layers */
+app-root,
+app-admin-layout,
+.admin-layout,
+.admin-content,
+.admin-main,
+app-admin-dashboard,
+.dashboard {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important; /* Allow shrinking in a flex context */
+  flex: 1 1 auto !important; /* Grow and shrink as needed */
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Core layout elements */
+app-admin-layout {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  height: 100vh !important;
+  width: 100vw !important;
+  overflow: hidden !important;
+}
+
+.admin-layout {
+  display: grid !important;
+  grid-template-columns: 280px 1fr !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+.admin-sidebar {
+  background-color: #fff !important;
+  position: fixed !important;
+  width: 280px !important;
+  height: 100vh !important;
+  z-index: 1000 !important;
+  overflow-y: auto !important;
+  box-shadow: none !important;
+  border-right: 1px solid #000 !important;
+  box-sizing: border-box !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.admin-content {
+  display: flex !important;
+  flex-direction: column !important;
+  width: calc(100vw - 280px) !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  margin-left: 280px !important;
+  flex: 1 1 auto !important;
+  box-sizing: border-box !important;
+  border-left: none !important;
+}
+
+.admin-main {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  width: 100% !important;
+  padding: 0 !important;
+  position: relative !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  border-top: 1px solid #000 !important;
+}
+
+/* Dashboard specific fixes */
+app-admin-dashboard {
+  flex: 1 1 auto !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  position: relative !important;
+}
+
+.dashboard {
+  min-height: 100vh !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  padding: 30px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  flex: 1 1 auto !important;
+}
+
+/* Make sure stable content takes available space */
+.stable-content {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 30px !important;
+  width: 100% !important;
+  margin-bottom: 50px !important;
+  min-height: 200px !important;
+}
+
+/* Recent orders */
+.recent-orders {
+  min-height: 300px !important;
+  width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  border: 1px solid #000 !important;
+  padding: 30px !important;
+}
+
+/* Fix for embedded router-outlet which can cause layout issues */
+router-outlet {
+  display: none !important;
+}
+
+router-outlet + * {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+}
+
+/* Emergency dashboard should always be hidden */
+.emergency-dashboard {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+/* Mobile fixes */
+@media (max-width: 992px) {
+  .admin-layout {
+    grid-template-columns: 0 1fr !important;
+  }
+  
+  .admin-content {
+    margin-left: 0 !important;
+    width: 100vw !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+} 

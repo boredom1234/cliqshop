@@ -1,0 +1,102 @@
+<div class="order-list">
+  <div class="order-list__header">
+    <h2 class="order-list__title">Orders</h2>
+    
+    <div class="order-filters">
+      <div class="filter-group">
+        <label for="status-filter">Filter by Status:</label>
+        <select id="status-filter" (change)="filterByStatus($any($event.target).value)">
+          <option value="">All Statuses</option>
+          <option value="PENDING">Pending</option>
+          <option value="CONFIRMED">Confirmed</option>
+          <option value="SHIPPED">Shipped</option>
+          <option value="DELIVERED">Delivered</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+      
+      <div class="sort-buttons">
+        <!-- <button class="sort-button" (click)="sortByStatus()">
+          Sort by Status
+        </button> -->
+        <button class="sort-button" (click)="sortByDate()">
+          Sort by Date
+        </button>
+        <button class="sort-button reset" (click)="resetFilters()">
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Filter indicator -->
+  <div class="filter-indicator" *ngIf="statusFilter">
+    <p>Filtered by status: <strong>{{ statusFilter }}</strong></p>
+    <button class="clear-filter" (click)="resetFilters()">Clear Filter</button>
+  </div>
+  
+  <!-- Error alert -->
+  <div class="alert alert-danger" *ngIf="error">
+    {{ error }}
+  </div>
+  
+  <!-- Orders table -->
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="7" class="loading">Loading orders...</td>
+        </tr>
+        <tr *ngFor="let order of orders">
+          <td>#{{ order?.id || 'N/A' }}</td>
+          <td>{{ order?.userName || 'Guest' }}</td>
+          <td>{{ order?.createdAt | date }}</td>
+          <td>{{ order?.items?.length || 0 }}</td>
+          <td>${{ order?.totalAmount?.toFixed(2) || '0.00' }}</td>
+          <td>
+            <span class="status" [ngClass]="getStatusColor(order?.status || '')">
+              {{ (order?.status || 'Unknown') }}
+            </span>
+          </td>
+          <td>
+            <div class="actions">
+              <button 
+                class="action-button update"
+                *ngIf="order?.status && canUpdateStatus(order.status)"
+                [disabled]="processingOrderId === order?.id"
+                (click)="order?.id && updateOrderStatus(order.id, getNextStatus(order.status))"
+              >
+                <span *ngIf="processingOrderId !== order?.id">
+                  {{ 'To ' + getNextStatus(order.status) }}
+                </span>
+                <span *ngIf="processingOrderId === order?.id">
+                  Processing...
+                </span>
+              </button>
+              <button 
+                class="action-button view" 
+                [routerLink]="['/admin/orders', order?.id]"
+              >
+                View Details
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && (!orders || orders.length === 0)">
+          <td colspan="7" class="no-data">No orders found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

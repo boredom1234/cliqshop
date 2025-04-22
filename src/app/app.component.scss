@@ -1,0 +1,7 @@
+@use '../styles/variables' as vars;
+
+.main-content {
+  min-height: calc(100vh - 200px); // Adjust based on header/footer heights
+  width: 100%;
+  padding: 0; // Remove padding to allow content to expand fully
+}

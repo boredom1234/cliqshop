@@ -1,0 +1,168 @@
+<div class="order-details-container">
+  <header class="page-header">
+    <button class="back-button" (click)="goBack()">
+      <i class="fa fa-arrow-left"></i> Back to Orders
+    </button>
+    <h1>Order Details</h1>
+  </header>
+
+  <!-- Loading state -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading order details...</p>
+  </div>
+
+  <!-- Error state -->
+  <div class="error-state" *ngIf="error">
+    <i class="fa fa-exclamation-circle"></i>
+    <p>{{ errorMessage }}</p>
+    <button class="back-button" (click)="goBack()">Return to Orders</button>
+  </div>
+
+  <!-- Order details -->
+  <ng-container *ngIf="(order$ | async) as order">
+    <div class="order-details" *ngIf="!loading && !error">
+      <div class="order-header">
+        <div class="order-id">
+          <h2>Order #{{ order.orderId }}</h2>
+          <span [ngClass]="getStatusClass(order.status)">{{ order.status }}</span>
+        </div>
+        <div class="order-date">
+          <p>Placed on {{ formatDate(order.createdAt) }}</p>
+          <!-- <p *ngIf="order.createdAt !== order.updatedAt">Last updated: {{ formatDate(order.updatedAt) }}</p> -->
+        </div>
+      </div>
+
+      <!-- Order Progress Tracker -->
+      <div class="order-progress-tracker">
+        <div class="progress-steps">
+          <div class="progress-step" [ngClass]="{'completed': isStatusCompleted('pending', order.status), 'active': isStatusActive('pending', order.status)}">
+            <div class="step-indicator">
+              <i class="fa fa-clock"></i>
+            </div>
+            <div class="step-label">Pending</div>
+          </div>
+          <div class="progress-step" [ngClass]="{'completed': isStatusCompleted('processing', order.status), 'active': isStatusActive('processing', order.status)}">
+            <div class="step-indicator">
+              <i class="fa fa-check-circle"></i>
+            </div>
+            <div class="step-label">Confirmed</div>
+          </div>
+          <div class="progress-step" [ngClass]="{'completed': isStatusCompleted('shipped', order.status), 'active': isStatusActive('shipped', order.status)}">
+            <div class="step-indicator">
+              <i class="fa fa-shipping-fast"></i>
+            </div>
+            <div class="step-label">Shipped</div>
+          </div>
+          <div class="progress-step" [ngClass]="{'completed': isStatusCompleted('delivered', order.status), 'active': isStatusActive('delivered', order.status)}">
+            <div class="step-indicator">
+              <i class="fa fa-box"></i>
+            </div>
+            <div class="step-label">Delivered</div>
+          </div>
+          <div class="progress-step cancelled" *ngIf="order.status.toLowerCase() === 'cancelled'">
+            <div class="step-indicator">
+              <i class="fa fa-times-circle"></i>
+            </div>
+            <div class="step-label">Cancelled</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add prominent order actions section after the header -->
+      <div class="prominent-order-actions" *ngIf="canCancelOrder(order.status)">
+        <button class="cancel-button" (click)="cancelOrder(order)" [disabled]="cancellingOrder">
+          <i class="fa fa-times-circle"></i> 
+          <span *ngIf="!cancellingOrder">Cancel Order</span>
+          <span *ngIf="cancellingOrder">Cancelling...</span>
+        </button>
+        <p class="cancel-note" *ngIf="order.status.toLowerCase() === 'pending'">
+          You can cancel this order as it's still being processed.
+        </p>
+        <p class="cancel-note" *ngIf="order.status.toLowerCase() === 'processing' || order.status.toLowerCase() === 'confirmed'">
+          You can still cancel this order, but it's being prepared for shipping.
+        </p>
+        <p class="cancel-note" *ngIf="order.status.toLowerCase() === 'shipped'">
+          This order is marked as shipped, but you can still request cancellation.
+        </p>
+      </div>
+
+      <div class="order-content">
+        <div class="order-info-panel">
+          <div class="info-section">
+            <h3>Shipping Address</h3>
+            <div class="address-info">
+              <p><strong>Name:</strong> {{ order.shippingAddress.firstName || order.shippingAddress.lastName ? 
+                ((order.shippingAddress.firstName || '') + ' ' + (order.shippingAddress.lastName || '')).trim() : 
+                'Not provided' }}</p>
+              <p><strong>Address:</strong> {{ order.shippingAddress.addressLine1 || 'Not provided' }}</p>
+              <p *ngIf="order.shippingAddress.addressLine2"><strong>Address Line 2:</strong> {{ order.shippingAddress.addressLine2 }}</p>
+              <p><strong>Location:</strong> 
+                {{ order.shippingAddress.city || 'City not provided' }}, 
+                {{ order.shippingAddress.state || 'State not provided' }} 
+                {{ order.shippingAddress.postalCode || 'Postal code not provided' }}
+              </p>
+              <p><strong>Country:</strong> {{ order.shippingAddress.country || 'Not provided' }}</p>
+              <p><strong>Phone:</strong> {{ order.shippingAddress.phone || 'Not provided' }}</p>
+              <p><strong>Email:</strong> {{ order.shippingAddress.email || 'Not provided' }}</p>
+              
+              <!-- <div class="user-data-note" *ngIf="userDetails">
+                <i class="fa fa-info-circle"></i> 
+                <small>Address information populated from your user profile.</small>
+              </div> -->
+            </div>
+          </div>
+
+          <!-- <div class="info-section">
+            <h3>Payment Information</h3>
+            <div class="payment-info">
+              <p><strong>Method:</strong> {{ order.payment.method }}</p>
+              <p *ngIf="order.payment.last4"><strong>Card ending in:</strong> **** **** **** {{ order.payment.last4 }}</p>
+            </div>
+          </div> -->
+        </div>
+
+        <div class="order-items">
+          <h3>Order Items</h3>
+          <div class="item-list">
+            <div class="item" *ngFor="let item of order.items">
+              <div class="item-image">
+                <img [src]="item.image" [alt]="item.name">
+              </div>
+              <div class="item-details">
+                <h4>{{ item.name }}</h4>
+                <p class="item-price">{{ formatCurrency(item.price) }}</p>
+                <p class="item-quantity">Quantity: {{ item.quantity }}</p>
+              </div>
+              <div class="item-total">
+                <p>{{ formatCurrency(item.price * item.quantity) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-summary">
+          <h3>Order Summary</h3>
+          <div class="summary-details">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span>{{ formatCurrency(order.summary.subtotal) }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span>{{ formatCurrency(order.summary.shipping) }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Tax</span>
+              <span>{{ formatCurrency(order.summary.tax) }}</span>
+            </div>
+            <div class="summary-row total">
+              <span>Total</span>
+              <span>{{ formatCurrency(order.summary.total) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
